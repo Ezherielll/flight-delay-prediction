@@ -9,19 +9,23 @@ class PredictionCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const PredictionCard({
-    Key? key,
+    super.key,
     required this.item,
     this.onDelete,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDelayed = item.response.classValue == 1;
-    final statusColor = isDelayed ? AppTheme.dangerColor : AppTheme.successColor;
-    final formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(item.timestamp);
-    
+    final statusColor = isDelayed
+        ? AppTheme.dangerColor
+        : AppTheme.successColor;
+    final formattedDate = DateFormat(
+      'dd MMM yyyy, HH:mm',
+    ).format(item.timestamp);
+
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -32,10 +36,7 @@ class PredictionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Left color accent bar
-              Container(
-                width: 6,
-                color: statusColor,
-              ),
+              Container(width: 6, color: statusColor),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -63,11 +64,17 @@ class PredictionCard extends StatelessWidget {
                             ],
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.1),
+                              color: statusColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
+                              border: Border.all(
+                                color: statusColor.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
                             ),
                             child: Text(
                               item.response.prediction,
@@ -89,7 +96,9 @@ class PredictionCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 
+                                0.7,
+                              ),
                             ),
                           ),
                           Text(
@@ -97,7 +106,9 @@ class PredictionCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: _getConfidenceColor(item.response.confidence),
+                              color: _getConfidenceColor(
+                                item.response.confidence,
+                              ),
                             ),
                           ),
                         ],
@@ -110,7 +121,9 @@ class PredictionCard extends StatelessWidget {
                             formattedDate,
                             style: TextStyle(
                               fontSize: 12,
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 
+                                0.5,
+                              ),
                             ),
                           ),
                           if (onDelete != null)
@@ -119,7 +132,7 @@ class PredictionCard extends StatelessWidget {
                               child: Icon(
                                 Icons.delete_outline,
                                 size: 18,
-                                color: theme.colorScheme.error.withOpacity(0.8),
+                                color: theme.colorScheme.error.withValues(alpha: 0.8),
                               ),
                             ),
                         ],

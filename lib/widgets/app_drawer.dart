@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import '../core/theme/theme.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({Key? key}) : super(key: key);
+  const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+    final l10n = AppLocalizations.of(context);
+
     // Get the current route path to highlight the active menu item
     final String currentRoute = GoRouterState.of(context).uri.path;
 
@@ -46,7 +48,7 @@ class AppDrawer extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -69,14 +71,14 @@ class AppDrawer extends StatelessWidget {
                   'Kualanamu International (KNO)',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 12),
 
           // Navigation list
@@ -86,39 +88,42 @@ class AppDrawer extends StatelessWidget {
               children: [
                 _buildDrawerItem(
                   context: context,
-                  title: 'Dashboard Home',
+                  title: l10n?.home ?? 'Dashboard Home',
                   icon: Icons.dashboard_rounded,
                   route: '/home',
                   currentRoute: currentRoute,
                 ),
                 _buildDrawerItem(
                   context: context,
-                  title: 'Run prediction',
+                  title: l10n?.flightDelayPrediction ?? 'Run prediction',
                   icon: Icons.online_prediction_rounded,
                   route: '/predict',
                   currentRoute: currentRoute,
                 ),
                 _buildDrawerItem(
                   context: context,
-                  title: 'Estimation History',
+                  title: l10n?.history ?? 'Estimation History',
                   icon: Icons.history_rounded,
                   route: '/history',
                   currentRoute: currentRoute,
                 ),
                 _buildDrawerItem(
                   context: context,
-                  title: 'Information Center',
+                  title: l10n?.infoCenter ?? 'Information Center',
                   icon: Icons.info_outline_rounded,
                   route: '/info',
                   currentRoute: currentRoute,
                 ),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
                   child: Divider(),
                 ),
                 _buildDrawerItem(
                   context: context,
-                  title: 'Settings',
+                  title: l10n?.settings ?? 'Settings',
                   icon: Icons.settings_rounded,
                   route: '/settings',
                   currentRoute: currentRoute,
@@ -131,11 +136,11 @@ class AppDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Text(
-              'Version 1.0.0',
+              '${l10n?.version ?? 'Version'} 1.0.0',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -158,23 +163,25 @@ class AppDrawer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: isSelected
-            ? theme.colorScheme.primary.withOpacity(0.12)
+            ? theme.colorScheme.primary.withValues(alpha: 0.12)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         leading: Icon(
           icon,
-          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.7),
+          color: isSelected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         title: Text(
           title,
           style: TextStyle(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.8),
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface.withValues(alpha: 0.8),
           ),
         ),
         onTap: () {

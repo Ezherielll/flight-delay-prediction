@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/info_center_data.dart';
+import 'locale_viewmodel.dart';
 
 // 1. State Class
 class InfoCenterState {
@@ -36,15 +37,24 @@ class InfoCenterState {
 class InfoCenterNotifier extends Notifier<InfoCenterState> {
   @override
   InfoCenterState build() {
-    Future.microtask(() => loadData());
-    return InfoCenterState();
+    final locale = ref.watch(localeProvider);
+    Future.microtask(() => loadData(locale.languageCode));
+    
+    final previousState = stateOrNull;
+    return InfoCenterState(
+      data: previousState?.data,
+      isLoading: previousState == null, // Show loading only on first startup
+      searchQuery: previousState?.searchQuery ?? '',
+    );
   }
 
-  Future<void> loadData() async {
+  Future<void> loadData([String? languageCode]) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      // Load static data from JSON asset file
-      final jsonString = await rootBundle.loadString('assets/data/info_center.json');
+      final code = languageCode ?? ref.read(localeProvider).languageCode;
+      // Load static data from JSON asset file based on active language
+      final fileName = code == 'id' ? 'info_center_id.json' : 'info_center.json';
+      final jsonString = await rootBundle.loadString('assets/data/$fileName');
       final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
       final infoCenterData = InfoCenterData.fromJson(jsonMap);
 

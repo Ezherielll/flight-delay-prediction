@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import '../../core/theme/theme.dart';
 import '../../models/prediction_request.dart';
 import '../../viewmodels/prediction_viewmodel.dart';
@@ -12,7 +13,7 @@ import '../../widgets/loading_dialog.dart';
 import '../../widgets/app_drawer.dart';
 
 class PredictionView extends ConsumerStatefulWidget {
-  const PredictionView({Key? key}) : super(key: key);
+  const PredictionView({super.key});
 
   @override
   ConsumerState<PredictionView> createState() => _PredictionViewState();
@@ -27,7 +28,16 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   String? _selectedMovementType;
   String? _selectedFltType = 'schedule';
 
-  final List<String> _airlines = ['GA', 'QG', 'JT', 'ID', 'IW', 'QZ', 'SJ', 'Other'];
+  final List<String> _airlines = [
+    'GA',
+    'QG',
+    'JT',
+    'ID',
+    'IW',
+    'QZ',
+    'SJ',
+    'Other',
+  ];
   final List<Map<String, String>> _movementTypes = [
     {'label': 'Arrival', 'value': 'arrival'},
     {'label': 'Departure', 'value': 'departure'},
@@ -111,8 +121,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   }
 
   void _checkFormValidity() {
-    final airlineOk = _selectedAirline != null &&
-        (_selectedAirline != 'Other' || _customAirlineController.text.trim().isNotEmpty);
+    final airlineOk =
+        _selectedAirline != null &&
+        (_selectedAirline != 'Other' ||
+            _customAirlineController.text.trim().isNotEmpty);
     final movementOk = _selectedMovementType != null;
     final fltOk = _selectedFltType != null;
     final dateOk = _selectedDate != null;
@@ -157,7 +169,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     final wgVal = double.tryParse(_windGustsController.text);
     final wgOk = wgVal != null && wgVal >= 0 && wgVal <= 200;
 
-    final isValid = airlineOk &&
+    final isValid =
+        airlineOk &&
         movementOk &&
         fltOk &&
         dateOk &&
@@ -293,7 +306,9 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     if (!mounted) return;
     LoadingDialog.show(context);
 
-    final success = await ref.read(predictionProvider.notifier).runPrediction(request);
+    final success = await ref
+        .read(predictionProvider.notifier)
+        .runPrediction(request);
 
     if (!mounted) return;
     LoadingDialog.hide(context);
@@ -313,7 +328,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
               Text('Inference Failed'),
             ],
           ),
-          content: Text(err ?? 'Could not complete delay prediction. Check server configuration.'),
+          content: Text(
+            err ??
+                'Could not complete delay prediction. Check server configuration.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -328,11 +346,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Flight Details & Forecast'),
+        title: Text(l10n?.flightDetailsForecast ?? 'Flight Details & Forecast'),
       ),
       body: Form(
         key: _formKey,
@@ -347,7 +366,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _CardTitle(title: 'Flight Information', icon: Icons.flight),
+                      _CardTitle(
+                        title: l10n?.flightInformation ?? 'Flight Information',
+                        icon: Icons.flight,
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,7 +381,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               hint: 'Select Airline',
                               prefixIcon: Icons.airplanemode_active,
                               items: _airlines
-                                  .map((a) => DropdownMenuItem(value: a, child: Text(a)))
+                                  .map(
+                                    (a) => DropdownMenuItem(
+                                      value: a,
+                                      child: Text(a),
+                                    ),
+                                  )
                                   .toList(),
                               onChanged: (val) {
                                 setState(() {
@@ -381,7 +408,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                                 hint: 'e.g. SQ, MH',
                                 keyboardType: TextInputType.text,
                                 validator: (val) {
-                                  if (_selectedAirline == 'Other' && (val == null || val.trim().isEmpty)) {
+                                  if (_selectedAirline == 'Other' &&
+                                      (val == null || val.trim().isEmpty)) {
                                     return 'Required';
                                   }
                                   return null;
@@ -397,10 +425,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         hint: 'Select Movement',
                         prefixIcon: Icons.swap_horiz,
                         items: _movementTypes
-                            .map((m) => DropdownMenuItem(
-                                  value: m['value'],
-                                  child: Text(m['label']!),
-                                ))
+                            .map(
+                              (m) => DropdownMenuItem(
+                                value: m['value'],
+                                child: Text(m['label']!),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
                           setState(() => _selectedMovementType = val);
@@ -413,10 +443,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         hint: 'Select Type',
                         prefixIcon: Icons.business_center,
                         items: _fltTypes
-                            .map((f) => DropdownMenuItem(
-                                  value: f['value'],
-                                  child: Text(f['label']!),
-                                ))
+                            .map(
+                              (f) => DropdownMenuItem(
+                                value: f['value'],
+                                child: Text(f['label']!),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
                           setState(() => _selectedFltType = val);
@@ -435,7 +467,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _CardTitle(title: 'Date & Time Settings', icon: Icons.access_time),
+                      const _CardTitle(
+                        title: 'Date & Time Settings',
+                        icon: Icons.access_time,
+                      ),
                       const SizedBox(height: 8),
                       // Date Picker
                       InkWell(
@@ -453,7 +488,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: _selectedDate == null
@@ -469,7 +507,9 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                                 Icons.calendar_today,
                                 size: 20,
                                 color: _selectedDate == null
-                                    ? theme.colorScheme.onSurface.withOpacity(0.5)
+                                    ? theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.5,
+                                      )
                                     : theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 12),
@@ -481,7 +521,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: _selectedDate == null
-                                        ? theme.colorScheme.onSurface.withOpacity(0.5)
+                                        ? theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.5)
                                         : theme.colorScheme.onSurface,
                                   ),
                                 ),
@@ -507,10 +548,14 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         hint: 'Select Hour',
                         prefixIcon: Icons.schedule,
                         items: _hours
-                            .map((h) => DropdownMenuItem(
-                                  value: h,
-                                  child: Text('${h.toString().padLeft(2, '0')}:00'),
-                                ))
+                            .map(
+                              (h) => DropdownMenuItem(
+                                value: h,
+                                child: Text(
+                                  '${h.toString().padLeft(2, '0')}:00',
+                                ),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
                           setState(() => _selectedHour = val);
@@ -529,16 +574,19 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _CardTitle(title: 'Weather & Wind Metrics', icon: Icons.wb_sunny_outlined),
+                      const _CardTitle(
+                        title: 'Weather & Wind Metrics',
+                        icon: Icons.wb_sunny_outlined,
+                      ),
                       const SizedBox(height: 8),
-                      
+
                       // PRESETS ROW
                       Text(
                         'Weather Preset Templates',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -546,10 +594,30 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
-                            _buildPresetChip('Clear Sky', 'clear', Icons.wb_sunny_rounded, Colors.orange),
-                            _buildPresetChip('Moderate', 'moderate', Icons.cloud_queue, Colors.blue),
-                            _buildPresetChip('Rainy Storm', 'rainy', Icons.thunderstorm_rounded, Colors.teal),
-                            _buildPresetChip('Windy Storm', 'windy', Icons.air, Colors.red),
+                            _buildPresetChip(
+                              'Clear Sky',
+                              'clear',
+                              Icons.wb_sunny_rounded,
+                              Colors.orange,
+                            ),
+                            _buildPresetChip(
+                              'Moderate',
+                              'moderate',
+                              Icons.cloud_queue,
+                              Colors.blue,
+                            ),
+                            _buildPresetChip(
+                              'Rainy Storm',
+                              'rainy',
+                              Icons.thunderstorm_rounded,
+                              Colors.teal,
+                            ),
+                            _buildPresetChip(
+                              'Windy Storm',
+                              'windy',
+                              Icons.air,
+                              Colors.red,
+                            ),
                           ],
                         ),
                       ),
@@ -564,7 +632,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Temperature',
                               hint: 'e.g. 28.5',
                               suffixText: '°C',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, -20, 50),
                             ),
                           ),
@@ -575,7 +646,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Rel. Humidity',
                               hint: 'e.g. 82',
                               suffixText: '%',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 100),
                             ),
                           ),
@@ -590,7 +664,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Rain Volume',
                               hint: 'e.g. 3.5',
                               suffixText: 'mm',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 300),
                             ),
                           ),
@@ -602,8 +679,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Surf. Pressure',
                               hint: 'e.g. 1009',
                               suffixText: 'hPa',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, 850, 1100),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              validator: (val) =>
+                                  _validateRange(val, 850, 1100),
                             ),
                           ),
                         ],
@@ -617,7 +698,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Total Clouds',
                               hint: '0 - 100',
                               suffixText: '%',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 100),
                             ),
                           ),
@@ -628,7 +712,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Low Clouds',
                               hint: '0 - 100',
                               suffixText: '%',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 100),
                             ),
                           ),
@@ -643,7 +730,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Mid Clouds',
                               hint: '0 - 100',
                               suffixText: '%',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 100),
                             ),
                           ),
@@ -654,7 +744,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'High Clouds',
                               hint: '0 - 100',
                               suffixText: '%',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 100),
                             ),
                           ),
@@ -669,7 +762,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Wind Speed 10m',
                               hint: 'e.g. 17',
                               suffixText: 'km/h',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 150),
                             ),
                           ),
@@ -680,7 +776,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Wind Speed 100m',
                               hint: 'e.g. 21',
                               suffixText: 'km/h',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 200),
                             ),
                           ),
@@ -695,7 +794,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Wind Dir 10m',
                               hint: '0 - 360',
                               suffixText: '°',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 360),
                             ),
                           ),
@@ -706,7 +808,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               label: 'Wind Dir 100m',
                               hint: '0 - 360',
                               suffixText: '°',
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               validator: (val) => _validateRange(val, 0, 360),
                             ),
                           ),
@@ -718,7 +823,9 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         label: 'Wind Gusts 10m',
                         hint: 'e.g. 29',
                         suffixText: 'km/h',
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         validator: (val) => _validateRange(val, 0, 200),
                       ),
                     ],
@@ -744,7 +851,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     );
   }
 
-  Widget _buildPresetChip(String label, String presetCode, IconData icon, Color color) {
+  Widget _buildPresetChip(
+    String label,
+    String presetCode,
+    IconData icon,
+    Color color,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ActionChip(
@@ -780,7 +892,7 @@ class _CardTitle extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const _CardTitle({Key? key, required this.title, required this.icon}) : super(key: key);
+  const _CardTitle({required this.title, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -791,10 +903,7 @@ class _CardTitle extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ],
     );

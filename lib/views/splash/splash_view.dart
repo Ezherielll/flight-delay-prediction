@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import '../../core/theme/theme.dart';
 
 class SplashView extends StatefulWidget {
-  const SplashView({Key? key}) : super(key: key);
+  const SplashView({super.key});
 
   @override
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> with SingleTickerProviderStateMixin {
+class _SplashViewState extends State<SplashView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -23,11 +25,17 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.65, curve: Curves.easeIn)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeIn),
+      ),
     );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.65, curve: Curves.easeOutBack)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeOutBack),
+      ),
     );
 
     _controller.forward();
@@ -49,6 +57,8 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -76,10 +86,10 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                       height: 100,
                       width: 100,
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withOpacity(0.1),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppTheme.primaryColor.withOpacity(0.2),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.2),
                           width: 2,
                         ),
                       ),
@@ -93,7 +103,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Flight Delay Estimator',
+                      l10n?.appTitle ?? 'Flight Delay Estimator',
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -101,9 +111,10 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'XGBoost AI-Powered Prediction',
+                      l10n?.xgboostPrediction ??
+                          'XGBoost AI-Powered Prediction',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -113,7 +124,9 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                       width: 28,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppTheme.primaryColor,
+                        ),
                       ),
                     ),
                   ],

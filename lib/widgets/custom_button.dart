@@ -9,14 +9,14 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.icon,
     this.backgroundColor,
     this.textColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +32,8 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: buttonColor,
           foregroundColor: contentColor,
-          disabledBackgroundColor: buttonColor.withOpacity(0.5),
-          disabledForegroundColor: contentColor.withOpacity(0.6),
+          disabledBackgroundColor: buttonColor.withValues(alpha: 0.5),
+          disabledForegroundColor: contentColor.withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

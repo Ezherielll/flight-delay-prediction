@@ -4,9 +4,10 @@ import '../../core/theme/theme.dart';
 import '../../models/info_center_data.dart';
 import '../../viewmodels/info_center_viewmodel.dart';
 import '../../widgets/app_drawer.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class InfoCenterView extends ConsumerStatefulWidget {
-  const InfoCenterView({Key? key}) : super(key: key);
+  const InfoCenterView({super.key});
 
   @override
   ConsumerState<InfoCenterView> createState() => _InfoCenterViewState();
@@ -34,11 +35,12 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
     final theme = Theme.of(context);
     final state = ref.watch(infoCenterProvider);
     final notifier = ref.read(infoCenterProvider.notifier);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Knowledge Base'),
+        title: Text(l10n?.knowledgeBase ?? 'Knowledge Base'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -49,13 +51,13 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       body: Builder(
         builder: (context) {
           if (state.isLoading) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading Information Center...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n?.loadingInformationCenter ?? 'Loading Information Center...'),
                 ],
               ),
             );
@@ -78,7 +80,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => notifier.loadData(),
-                      child: const Text('Retry Loading'),
+                      child: Text(l10n?.retryLoading ?? 'Retry Loading'),
                     )
                   ],
                 ),
@@ -87,7 +89,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
           }
 
           if (state.data == null) {
-            return const Center(child: Text('No data loaded.'));
+            return Center(child: Text(l10n?.noDataLoaded ?? 'No data loaded.'));
           }
 
           final data = state.data!;
@@ -104,7 +106,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Information Center',
+                      l10n?.informationCenter ?? 'Information Center',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.onSurface,
@@ -112,9 +114,9 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Understand terminology, flight reference data, weather guidelines, and system models.',
+                      l10n?.informationCenterDesc ?? 'Understand terminology, flight reference data, weather guidelines, and system models.',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -123,8 +125,8 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        labelText: 'Search Information',
-                        hintText: 'Search airlines, airports, glossary, FAQs, weather...',
+                        labelText: l10n?.searchInformation ?? 'Search Information',
+                        hintText: l10n?.searchPlaceholder ?? 'Search airlines, airports, glossary, FAQs, weather...',
                         prefixIcon: const Icon(Icons.search),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
@@ -156,13 +158,13 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                             isScrollable: true,
                             tabAlignment: TabAlignment.start,
                             labelColor: theme.colorScheme.primary,
-                            unselectedLabelColor: theme.colorScheme.onSurface.withOpacity(0.6),
+                            unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                             indicatorColor: theme.colorScheme.primary,
-                            tabs: const [
-                              Tab(text: 'System & ML'),
-                              Tab(text: 'Weather Guide'),
-                              Tab(text: 'Directory'),
-                              Tab(text: 'FAQ & Glossary'),
+                            tabs: [
+                              Tab(text: l10n?.systemAndMl ?? 'System & ML'),
+                              Tab(text: l10n?.weatherGuide ?? 'Weather Guide'),
+                              Tab(text: l10n?.directory ?? 'Directory'),
+                              Tab(text: l10n?.faqAndGlossary ?? 'FAQ & Glossary'),
                             ],
                           ),
                           
@@ -231,7 +233,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.search_off_rounded, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.15)),
+              Icon(Icons.search_off_rounded, size: 64, color: theme.colorScheme.onSurface.withValues(alpha: 0.15)),
               const SizedBox(height: 16),
               const Text(
                 'No Search Results',
@@ -241,7 +243,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
               Text(
                 'No items matched "$query". Try spelling differently.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
               ),
             ],
           ),
@@ -323,7 +325,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: theme.colorScheme.primary.withOpacity(0.7)),
+          Icon(icon, size: 16, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
           const SizedBox(width: 8),
           Text(
             title.toUpperCase(),
@@ -342,7 +344,6 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
   // --- TAB 1: SYSTEM & ML ---
   Widget _buildSystemMlTab(BuildContext context, InfoCenterData data) {
     final theme = Theme.of(context);
-    final width = MediaQuery.of(context).size.width;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -381,9 +382,9 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withOpacity(0.03),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.06)),
+                    border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.06)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,7 +537,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.star, size: 16, color: theme.colorScheme.primary.withOpacity(0.7)),
+                                  Icon(Icons.star, size: 16, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
                                   const SizedBox(width: 8),
                                   Expanded(child: Text(adv, style: const TextStyle(fontSize: 13, height: 1.3))),
                                 ],
@@ -576,7 +577,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -627,7 +628,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
               const SizedBox(height: 2),
               Text(
                 text,
-                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withOpacity(0.7), height: 1.3),
+                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.7), height: 1.3),
               ),
             ],
           ),
@@ -648,17 +649,17 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         child: Row(
           children: List.generate(steps.length * 2 - 1, (i) {
             if (i.isOdd) {
-              return Icon(Icons.arrow_forward, color: theme.colorScheme.primary.withOpacity(0.6), size: 20);
+              return Icon(Icons.arrow_forward, color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 20);
             }
             final idx = i ~/ 2;
             final step = steps[idx];
             return Expanded(
               child: Card(
                 elevation: 0,
-                color: theme.colorScheme.primary.withOpacity(0.04),
+                color: theme.colorScheme.primary.withValues(alpha: 0.04),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.12)),
+                  side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.12)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -695,7 +696,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         if (i.isOdd) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Icon(Icons.arrow_downward, color: theme.colorScheme.primary.withOpacity(0.6), size: 20),
+            child: Icon(Icons.arrow_downward, color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 20),
           );
         }
         final idx = i ~/ 2;
@@ -703,10 +704,10 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         return Card(
           elevation: 0,
           margin: EdgeInsets.zero,
-          color: theme.colorScheme.primary.withOpacity(0.04),
+          color: theme.colorScheme.primary.withValues(alpha: 0.04),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.12)),
+            side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.12)),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -729,7 +730,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                       const SizedBox(height: 2),
                       Text(
                         step.desc,
-                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                       ),
                     ],
                   ),
@@ -792,7 +793,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -819,7 +820,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     'Operational Impact: ${w.impact}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       fontWeight: FontWeight.w600,
                       height: 1.3,
                     ),
@@ -837,7 +838,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
     final theme = Theme.of(context);
     
     // Help select colors representing warning severity
-    Color _getSeverityColor(String level) {
+    Color getSeverityColor(String level) {
       switch (level.toLowerCase()) {
         case 'excellent':
         case 'calm':
@@ -865,7 +866,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.08), width: 1.5),
+        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.08), width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -873,19 +874,19 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: theme.colorScheme.onSurface.withOpacity(0.04),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
             child: Text(
               title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
           ...bands.map((band) {
-            final col = _getSeverityColor(band.level);
+            final col = getSeverityColor(band.level);
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.04)),
+                  bottom: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.04)),
                 ),
               ),
               child: Row(
@@ -894,7 +895,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     width: 90,
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: col.withOpacity(0.12),
+                      color: col.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -904,7 +905,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Container(
+                  SizedBox(
                     width: 100,
                     child: Text(
                       band.range,
@@ -915,7 +916,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                   Expanded(
                     child: Text(
                       band.description,
-                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                     ),
                   ),
                 ],
@@ -948,7 +949,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.08), width: 1.5),
+        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.08), width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -956,7 +957,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: theme.colorScheme.onSurface.withOpacity(0.04),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
             child: const Row(
               children: [
                 Icon(Icons.airplanemode_active, size: 18),
@@ -971,8 +972,8 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
               child: Container(
                 constraints: BoxConstraints(minWidth: width - 32),
                 child: DataTable(
-                  headingRowColor: MaterialStateProperty.resolveWith(
-                    (states) => theme.colorScheme.onSurface.withOpacity(0.02),
+                  headingRowColor: WidgetStateProperty.resolveWith(
+                    (states) => theme.colorScheme.onSurface.withValues(alpha: 0.02),
                   ),
                   headingRowHeight: 44,
                   dataRowMinHeight: 48,
@@ -1009,7 +1010,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.08), width: 1.5),
+        side: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.08), width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -1017,7 +1018,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: theme.colorScheme.onSurface.withOpacity(0.04),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
             child: const Row(
               children: [
                 Icon(Icons.local_airport, size: 18),
@@ -1032,8 +1033,8 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
               child: Container(
                 constraints: BoxConstraints(minWidth: width - 32),
                 child: DataTable(
-                  headingRowColor: MaterialStateProperty.resolveWith(
-                    (states) => theme.colorScheme.onSurface.withOpacity(0.02),
+                  headingRowColor: WidgetStateProperty.resolveWith(
+                    (states) => theme.colorScheme.onSurface.withValues(alpha: 0.02),
                   ),
                   headingRowHeight: 44,
                   dataRowMinHeight: 48,
@@ -1089,7 +1090,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                       f.answer,
                       style: TextStyle(
                         fontSize: 13,
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                         height: 1.4,
                       ),
                     ),
@@ -1119,7 +1120,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                       g.definition,
                       style: TextStyle(
                         fontSize: 13,
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                         height: 1.4,
                       ),
                     ),

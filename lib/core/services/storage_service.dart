@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -9,6 +8,7 @@ class StorageService {
   static const String _keyBaseUrl = 'base_url';
   static const String _keyDarkMode = 'dark_mode';
   static const String _keyHistory = 'prediction_history';
+  static const String _keyLocale = 'app_locale';
 
   // Base API URL
   String getBaseUrl() {
@@ -17,6 +17,15 @@ class StorageService {
 
   Future<void> setBaseUrl(String url) async {
     await _prefs.setString(_keyBaseUrl, url);
+  }
+
+  // Locale Preference
+  String? getLocale() {
+    return _prefs.getString(_keyLocale);
+  }
+
+  Future<void> setLocale(String languageCode) async {
+    await _prefs.setString(_keyLocale, languageCode);
   }
 
   // Dark Mode Preference

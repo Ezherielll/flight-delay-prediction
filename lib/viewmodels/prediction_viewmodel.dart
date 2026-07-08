@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'settings_viewmodel.dart';
-import '../core/services/api_service.dart';
-import '../core/services/storage_service.dart';
 import '../models/prediction_request.dart';
 import '../models/prediction_response.dart';
 import '../models/history_item.dart';
@@ -87,7 +85,8 @@ class PredictionNotifier extends Notifier<PredictionState> {
       await storageService.addHistoryItem(historyJson);
 
       // Update state with result and updated history list
-      final updatedHistory = List<HistoryItem>.from(state.history)..insert(0, historyItem);
+      final updatedHistory = List<HistoryItem>.from(state.history)
+        ..insert(0, historyItem);
 
       state = state.copyWith(
         isLoading: false,
@@ -107,7 +106,10 @@ class PredictionNotifier extends Notifier<PredictionState> {
   }
 
   // Set active prediction state from history
-  void setLatestPrediction(PredictionRequest request, PredictionResponse response) {
+  void setLatestPrediction(
+    PredictionRequest request,
+    PredictionResponse response,
+  ) {
     state = state.copyWith(latestRequest: request, latestResponse: response);
   }
 
@@ -128,6 +130,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
 }
 
 // 3. Prediction Provider
-final predictionProvider = NotifierProvider<PredictionNotifier, PredictionState>(() {
-  return PredictionNotifier();
-});
+final predictionProvider =
+    NotifierProvider<PredictionNotifier, PredictionState>(() {
+      return PredictionNotifier();
+    });

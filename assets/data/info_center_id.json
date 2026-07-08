@@ -1,0 +1,205 @@
+{
+  "about": {
+    "purpose": "Aplikasi ini menyediakan estimasi keterlambatan penerbangan secara real-time dengan menggabungkan data operasional penerbangan historis dengan laporan meteorologi langsung. Ini membantu dispatcher, pilot, dan tim kontrol pergerakan dalam mengantisipasi masalah penjadwalan.",
+    "importance": "Keterlambatan penerbangan merambat melalui jaringan maskapai, meningkatkan biaya operasional dan mengganggu rencana penumpang. Memprediksi keterlambatan sebelumnya membantu perutean ulang yang proaktif, optimalisasi bahan bakar, dan penjadwalan gerbang bandara.",
+    "ml_usage": "Dengan melatih pengklasifikasi pembelajaran mesin pada ratusan ribu penerbangan masa lalu dan kondisi cuaca lokal per jam yang sesuai, sistem ini mempelajari hubungan non-linear kompleks yang memicu penundaan operasional.",
+    "data_sources": [
+      "Log operasional penerbangan (tipe pergerakan, kode maskapai, jadwal)",
+      "Kumpulan data cuaca historis dan real-time per jam API Open-Meteo"
+    ]
+  },
+  "classification": {
+    "on_time": "Penerbangan diperkirakan berangkat atau tiba dalam waktu 30 menit dari waktu yang dijadwalkan.",
+    "delay": "Penerbangan diperkirakan menyimpang dari waktu yang dijadwalkan selama 30 menit atau lebih.",
+    "definition": "Sebuah penerbangan secara resmi diklasifikasikan sebagai 'Terlambat' (Delayed) jika Waktu Keberangkatan Aktual (ATD) adalah 30 menit atau lebih setelah Waktu Keberangkatan Terjadwal (STD)."
+  },
+  "airlines": [
+    { "code": "GA", "name": "Garuda Indonesia", "country": "Indonesia" },
+    { "code": "JT", "name": "Lion Air", "country": "Indonesia" },
+    { "code": "ID", "name": "Batik Air", "country": "Indonesia" },
+    { "code": "IW", "name": "Wings Air", "country": "Indonesia" },
+    { "code": "QZ", "name": "AirAsia Indonesia", "country": "Indonesia" },
+    { "code": "AK", "name": "AirAsia Malaysia", "country": "Malaysia" },
+    { "code": "SQ", "name": "Singapore Airlines", "country": "Singapura" },
+    { "code": "MH", "name": "Malaysia Airlines", "country": "Malaysia" },
+    { "code": "TR", "name": "Scoot", "country": "Singapura" },
+    { "code": "OD", "name": "Batik Air Malaysia", "country": "Malaysia" }
+  ],
+  "airports": [
+    { "iata": "KNO", "name": "Bandar Udara Internasional Kualanamu", "city": "Medan", "country": "Indonesia" },
+    { "iata": "CGK", "name": "Bandar Udara Internasional Soekarno-Hatta", "city": "Jakarta", "country": "Indonesia" },
+    { "iata": "SIN", "name": "Bandar Udara Changi Singapura", "city": "Singapura", "country": "Singapura" },
+    { "iata": "KUL", "name": "Bandar Udara Internasional Kuala Lumpur", "city": "Kuala Lumpur", "country": "Malaysia" },
+    { "iata": "DPS", "name": "Bandar Udara Internasional Ngurah Rai", "city": "Denpasar", "country": "Indonesia" },
+    { "iata": "SUB", "name": "Bandar Udara Internasional Juanda", "city": "Surabaya", "country": "Indonesia" }
+  ],
+  "weather_parameters": [
+    {
+      "name": "Suhu",
+      "unit": "Celsius (°C)",
+      "description": "Suhu atmosfer sekitar yang diukur 2 meter di atas permukaan tanah.",
+      "impact": "Panas tinggi mengurangi kerapatan udara, menurunkan gaya angkat dan gaya dorong mesin. Hal ini memaksa pembatasan berat pesawat, berpotensi menyebabkan keterlambatan pemuatan kargo."
+    },
+    {
+      "name": "Visibilitas",
+      "unit": "meter (m)",
+      "description": "Jarak horizontal di mana objek dapat dilihat dan diidentifikasi dengan jelas oleh pilot atau pengontrol.",
+      "impact": "Visibilitas rendah di bawah batas minimum bandara menghentikan operasi penerbangan visual, memaksa pendekatan instrumen dengan pemisahan jarak yang lebih lebar, langsung menyebabkan penumpukan antrean."
+    },
+    {
+      "name": "Kecepatan Angin",
+      "unit": "km/jam",
+      "description": "Laju pergerakan udara yang diukur secara horizontal pada ketinggian 10 meter dan 100 meter di atas landasan pacu.",
+      "impact": "Kecepatan angin yang tinggi, terutama angin silang (crosswind) yang melebihi batas struktural pesawat, akan menangguhkan operasi landasan pacu atau memaksa pesawat untuk berputar (holding)."
+    },
+    {
+      "name": "Arah Angin",
+      "unit": "derajat (°)",
+      "description": "Arah kompas dari mana angin berasal (0° = Utara, 180° = Selatan).",
+      "impact": "Sangat penting untuk konfigurasi landasan pacu. Komponen angin ekor (tailwind) memaksa perubahan arah landasan pacu aktif, memperlambat jadwal taksi dan keberangkatan."
+    },
+    {
+      "name": "Curah Hujan",
+      "unit": "milimeter (mm)",
+      "description": "Kedalaman air cair (hujan) yang jatuh di tanah selama satu jam tertentu.",
+      "impact": "Hujan lebat menurunkan visibilitas, menyebabkan akumulasi air di permukaan landasan pacu (risiko hydroplaning), dan mengganggu operasi penanganan darat (ground handling)."
+    },
+    {
+      "name": "Kelembapan",
+      "unit": "persentase (%)",
+      "description": "Jumlah uap air yang ada di udara relatif terhadap kapasitas maksimum pada suhu tersebut.",
+      "impact": "Kelembapan relatif yang tinggi dikombinasikan dengan pergeseran suhu menyebabkan pembentukan kabut dini, sangat mengurangi jarak pandang landasan pacu."
+    },
+    {
+      "name": "Tekanan Permukaan",
+      "unit": "hektopaskal (hPa)",
+      "description": "Tekanan atmosfer yang diukur langsung pada tingkat permukaan bandara.",
+      "impact": "Sistem tekanan rendah melambangkan badai, cuaca tidak stabil, dan turbulensi, sedangkan sistem tekanan tinggi umumnya melambangkan kondisi yang stabil."
+    },
+    {
+      "name": "Tutupan Awan",
+      "unit": "persentase (%)",
+      "description": "Fraksi langit yang tertutup awan, dikategorikan berdasarkan tutupan ketinggian Rendah, Menengah, dan Tinggi.",
+      "impact": "Awan tingkat rendah menghalangi pendekatan instrumen dan jalur luncur (glide path), sedangkan awan tingkat tinggi memiliki dampak yang dapat diabaikan pada operasi darat."
+    },
+    {
+      "name": "Kode Cuaca",
+      "unit": "Kode WMO",
+      "description": "Kode numerik Organisasi Meteorologi Dunia yang mewakili deskriptor cuaca tertentu (misalnya badai petir, gerimis, kabut).",
+      "impact": "Mengkategorikan tingkat keparahan umum secara instan. Badai petir aktif (Kode 95-99) atau gerimis dingin yang lebat menangguhkan semua tindakan di darat."
+    }
+  ],
+  "weather_severity": {
+    "visibility": [
+      { "level": "Sangat Baik", "range": "> 10.000 m", "description": "Penerbangan visual tanpa batas." },
+      { "level": "Baik", "range": "5.000 m - 10.000 m", "description": "Operasi bandara visual normal." },
+      { "level": "Sedang", "range": "2.000 m - 5.000 m", "description": "Perlu berhati-hati. Operasi visual marginal." },
+      { "level": "Buruk", "range": "800 m - 2.000 m", "description": "Sistem pendaratan instrumen (ILS) diperlukan." },
+      { "level": "Kritis", "range": "< 800 m", "description": "Keterlambatan parah. Mendekati batas penutupan landasan pacu." }
+    ],
+    "wind_speed": [
+      { "level": "Tenang", "range": "< 10 km/jam", "description": "Kondisi penerbangan ideal." },
+      { "level": "Ringan", "range": "10 - 20 km/jam", "description": "Penanganan operasional yang mudah." },
+      { "level": "Sedang", "range": "20 - 35 km/jam", "description": "Turbulensi ringan. Penyesuaian landasan pacu dimungkinkan." },
+      { "level": "Kuat", "range": "35 - 50 km/jam", "description": "Peringatan angin silang. Pemuatan darat mungkin ditunda." },
+      { "level": "Sangat Kuat", "range": "> 50 km/jam", "description": "Angin silang parah. Perkirakan pengalihan atau penangguhan." }
+    ],
+    "rain": [
+      { "level": "Tidak Hujan", "range": "0 mm", "description": "Landasan pacu kering." },
+      { "level": "Hujan Ringan", "range": "< 2 mm/jam", "description": "Permukaan basah. Operasi standar." },
+      { "level": "Hujan Sedang", "range": "2 - 8 mm/jam", "description": "Jarak pengereman bertambah. Visibilitas berkurang." },
+      { "level": "Hujan Lebat", "range": "> 8 mm/jam", "description": "Bahaya hydroplaning. Mengganggu pemuatan bagasi." }
+    ]
+  },
+  "prediction_guide": {
+    "on_time_meaning": "Model menghitung probabilitas keterlambatan keberangkatan yang rendah. Di bawah parameter yang dipilih, jadwal normal sangat mungkin terjadi.",
+    "delay_meaning": "Model menghitung probabilitas tinggi keterlambatan keberangkatan melebihi 30 menit. Penyesuaian operasional sangat disarankan.",
+    "confidence_expl": "Persentase probabilitas menunjukkan keyakinan matematis model dalam kelas yang diprediksi. Sebagai contoh, probabilitas keterlambatan 92% berarti model sangat yakin bahwa parameter operasional selaras dengan pola keterlambatan historis masa lalu."
+  },
+  "ml_models": [
+    {
+      "name": "Decision Tree",
+      "advantages": [
+        "Aturan yang sangat intuitif yang dapat divisualisasikan sebagai diagram alur",
+        "Kecepatan inferensi yang sangat cepat",
+        "Memetakan keputusan secara langsung berdasarkan pembagian fitur berurutan"
+      ]
+    },
+    {
+      "name": "XGBoost",
+      "advantages": [
+        "Algoritma ensemble boosting yang membuat ratusan pohon keputusan secara berurutan",
+        "Akurasi prediksi tertinggi dan generalisasi yang kuat pada pola baru",
+        "Mengidentifikasi interaksi cuaca non-linear yang sangat detail"
+      ]
+    }
+  ],
+  "feature_importance": {
+    "intro": "Tidak setiap metrik atmosfer atau operasional memengaruhi jadwal penerbangan secara merata. Model pembelajaran mesin menimbang fitur berdasarkan korelasi historis.",
+    "top_features": [
+      { "feature": "Visibilitas", "impact": "Dampak tertinggi. Visibilitas buruk menghalangi pendaratan dan keberangkatan sepenuhnya." },
+      { "feature": "Volume Curah Hujan", "impact": "Dampak tinggi. Landasan basah meningkatkan jarak pengereman dan memperlambat penanganan darat." },
+      { "feature": "Kecepatan Angin", "impact": "Dampak sedang. Memengaruhi batas keselamatan struktural terhadap angin silang." },
+      { "feature": "Suhu", "impact": "Dampak kecil. Memengaruhi kinerja daya dorong mesin pada hari-hari panas." }
+    ]
+  },
+  "faq": [
+    {
+      "question": "Apa yang diklasifikasikan sebagai keterlambatan penerbangan dalam sistem ini?",
+      "answer": "Keterlambatan penerbangan didefinisikan sebagai keberangkatan yang terjadi 30 menit atau lebih setelah waktu keberangkatan yang dijadwalkan (STD)."
+    },
+    {
+      "question": "Mengapa cuaca dapat menyebabkan keterlambatan penerbangan?",
+      "answer": "Kondisi cuaca buruk seperti curah hujan yang tinggi, visibilitas rendah, dan angin kencang membahayakan keselamatan penerbangan. Air Traffic Control (ATC) memperlebar jarak antarpenerbangan, memperlambat operasi, sementara kru darat mungkin menghentikan aktivitas di apron."
+    },
+    {
+      "question": "Mengapa tidak semua hari hujan menyebabkan keterlambatan?",
+      "answer": "Hujan ringan atau hujan dengan visibilitas sangat baik dan angin tenang sangat mudah dikelola. Keterlambatan biasanya terjadi ketika curah hujan tinggi, air menggenangi permukaan landasan pacu, visibilitas turun di bawah batas minimum pendaratan, atau terjadi angin kencang secara bersamaan."
+    },
+    {
+      "question": "Mengapa hasil prediksi terkadang berbeda dengan kenyataan?",
+      "answer": "Model pembelajaran mesin memprediksi berdasarkan statistik historis dan prakiraan cuaca. Mereka tidak dapat mengantisipasi kejadian tak terduga seperti pemeliharaan pesawat dadakan, kru terlambat datang, keadaan darurat medis, atau masalah lalu lintas udara yang mendadak."
+    },
+    {
+      "question": "Seberapa akurat model prediksi ini?",
+      "answer": "Model XGBoost yang telah disesuaikan mencapai akurasi sekitar 85% hingga 90% pada dataset pengujian. Akurasi ini dapat bervariasi tergantung pada ketepatan prakiraan cuaca yang masuk."
+    },
+    {
+      "question": "Apakah administrator dapat melatih ulang model?",
+      "answer": "Ya. Pengguna admin dapat mengunggah log historis baru (log operasional penerbangan dan indeks cuaca METAR lokal) untuk memicu alur kerja otomatis yang melatih ulang dan menyebarkan file model yang diperbarui."
+    },
+    {
+      "question": "Seberapa sering model harus dilatih ulang?",
+      "answer": "Pelatihan ulang biasanya dilakukan setiap tiga bulan sekali atau selama pergantian musim (misalnya musim hujan vs musim kemarau) untuk menangkap pergeseran pola angin monsun dan perubahan dalam jadwal dasar."
+    }
+  ],
+  "workflow": [
+    { "step": "1", "name": "Data Penerbangan", "desc": "Masukkan informasi jadwal maskapai, tipe operasi penerbangan, jam, dan tanggal." },
+    { "step": "2", "name": "Data Cuaca", "desc": "Ambil metrik cuaca langsung (angin, hujan, awan, visibilitas) dari model prakiraan cuaca." },
+    { "step": "3", "name": "Pra-pemrosesan", "desc": "Hitung rasio turunan (misalnya rasio hembusan angin, indeks awan-hujan) untuk menyelaraskan fitur." },
+    { "step": "4", "name": "Model ML", "desc": "Jalankan perhitungan melalui pengklasifikasi XGBoost atau Decision Tree yang terlatih." },
+    { "step": "5", "name": "Hasil Prediksi", "desc": "Evaluasi hasil, memetakan output ke Tepat Waktu atau Terlambat beserta probabilitas keyakinan." },
+    { "step": "6", "name": "Dasbor", "desc": "Tampilkan ringkasan berformat, lencana warna, dan catatan peringatan di layar." }
+  ],
+  "glossary": [
+    { "term": "AMC (Apron Movement Control)", "definition": "Unit otoritas bandara yang bertanggung jawab untuk mengatur parkir gerbang landasan pacu, izin pushback, dan operasi taksi pesawat di apron." },
+    { "term": "ETA (Estimated Time of Arrival)", "definition": "Perkiraan waktu di mana pesawat akan mendarat di landasan pacu." },
+    { "term": "ETD (Estimated Time of Departure)", "definition": "Perkiraan waktu di mana pesawat akan mulai bergerak mundur (pushback) dari tempat parkir." },
+    { "term": "STD (Scheduled Time of Departure)", "definition": "Waktu keberangkatan resmi yang dijadwalkan dan diterbitkan oleh maskapai." },
+    { "term": "ATD (Actual Time of Departure)", "definition": "Waktu keberangkatan pesawat yang sebenarnya saat mulai bergerak meninggalkan gerbang atau landasan untuk lepas landas." },
+    { "term": "Kode IATA", "definition": "Kode 3-huruf yang menetapkan bandara di seluruh dunia (misalnya, KNO untuk Kualanamu, CGK untuk Soekarno-Hatta) atau kode 2-huruf untuk maskapai penerbangan (misalnya, GA untuk Garuda)." },
+    { "term": "Kode ICAO", "definition": "Indikator bandara 4-huruf (misalnya WIMM untuk Kualanamu) atau indikator maskapai 3-huruf (misalnya GIA untuk Garuda) yang digunakan oleh pilot dan kontrol lalu lintas udara." },
+    { "term": "Landasan Pacu (Runway)", "definition": "Area persegi panjang yang ditentukan di bandar udara yang disiapkan untuk pendaratan dan lepas landas pesawat." },
+    { "term": "Landasan Hubung (Taxiway)", "definition": "Jalur beraspal di bandara yang menghubungkan landasan pacu dengan apron, hanggar, dan terminal, digunakan untuk taksi pesawat." },
+    { "term": "Apron", "definition": "Juga disebut ramp, ini adalah area di mana pesawat diparkir, dimuat, dibongkar, diisi bahan bakar, atau dinaiki penumpang." },
+    { "term": "Pushback", "definition": "Prosedur operasional di mana pesawat didorong mundur menjauhi gerbang bandara oleh mobil derek (tug) eksternal." },
+    { "term": "Ground Handling", "definition": "Layanan yang diberikan kepada pesawat selama diparkir di gerbang terminal, termasuk penanganan bagasi, pengisian bahan bakar, katering, dan pembersihan kabin." },
+    { "term": "Meteorologi", "definition": "Cabang ilmu yang bersangkutan dengan proses dan fenomena atmosfer, terutama sebagai sarana memprakirakan cuaca." },
+    { "term": "Machine Learning", "definition": "Subbidang kecerdasan buatan yang berfokus pada pembuatan algoritma yang mempelajari pola dari kumpulan data untuk membuat keputusan otomatis." },
+    { "term": "Decision Tree", "definition": "Model pembelajaran mesin terawasi yang memetakan parameter ke prediksi menggunakan aturan percabangan logis hierarkis." },
+    { "term": "XGBoost", "definition": "Pustaka pembelajaran mesin gradient boosting teroptimasi yang menggabungkan ratusan pohon keputusan sederhana untuk menghasilkan kinerja tinggi." },
+    { "term": "ROC-AUC", "definition": "Receiver Operating Characteristic - Area Under Curve. Metrik statistik yang digunakan untuk mengukur kinerja diskriminatif model klasifikasi." },
+    { "term": "Precision / Recall / F1 Score", "definition": "Metrik evaluasi: Presisi mengukur akurasi prediksi positif, Recall mengukur tingkat deteksi, dan F1 Score menggabungkan keduanya menjadi satu nilai rata-rata harmonik." },
+    { "term": "Confusion Matrix", "definition": "Tata letak tabel yang digunakan untuk memvisualisasikan kinerja algoritma klasifikasi dengan membandingkan nilai aktual dengan hasil prediksi." }
+  ]
+}

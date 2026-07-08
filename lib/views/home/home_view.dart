@@ -5,9 +5,10 @@ import '../../viewmodels/prediction_viewmodel.dart';
 import '../../viewmodels/settings_viewmodel.dart';
 import '../../core/theme/theme.dart';
 import '../../widgets/app_drawer.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class HomeView extends ConsumerWidget {
-  const HomeView({Key? key}) : super(key: key);
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,15 +16,18 @@ class HomeView extends ConsumerWidget {
     final predictionState = ref.watch(predictionProvider);
     final settingsState = ref.watch(settingsProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
+    final l10n = AppLocalizations.of(context);
 
     final totalPredictions = predictionState.history.length;
-    final delayedCount = predictionState.history.where((e) => e.response.classValue == 1).length;
+    final delayedCount = predictionState.history
+        .where((e) => e.response.classValue == 1)
+        .length;
     final onTimeCount = totalPredictions - delayedCount;
 
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Flight Delay Estimator'),
+        title: Text(l10n?.appTitle ?? 'Flight Delay Estimator'),
         actions: [
           IconButton(
             icon: Icon(
@@ -64,9 +68,10 @@ class HomeView extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'AI-Powered Flight Intelligence',
-                    style: TextStyle(
+                  Text(
+                    l10n?.aiPoweredFlightIntelligence ??
+                        'AI-Powered Flight Intelligence',
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -74,10 +79,11 @@ class HomeView extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Predict airline departure and arrival delays using local weather conditions and real-time operational parameters.',
+                    l10n?.aiPoweredFlightIntelligenceDesc ??
+                        'Predict airline departure and arrival delays using local weather conditions and real-time operational parameters.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                       height: 1.4,
                     ),
                   ),
@@ -85,19 +91,22 @@ class HomeView extends ConsumerWidget {
                   ElevatedButton.icon(
                     onPressed: () => context.push('/predict'),
                     icon: const Icon(Icons.analytics, size: 20),
-                    label: const Text('Start Prediction'),
+                    label: Text(l10n?.startPrediction ?? 'Start Prediction'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: AppTheme.primaryColor,
                       elevation: 4,
                       shadowColor: Colors.black26,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14.0,
+                        horizontal: 20.0,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
 
             // Statistics Row
@@ -107,7 +116,7 @@ class HomeView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Your Activity',
+                    l10n?.yourActivity ?? 'Your Activity',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -119,7 +128,7 @@ class HomeView extends ConsumerWidget {
                       Expanded(
                         child: _buildStatCard(
                           context,
-                          'Total Checks',
+                          l10n?.totalChecks ?? 'Total Checks',
                           '$totalPredictions',
                           Icons.query_stats,
                           theme.colorScheme.primary,
@@ -128,7 +137,7 @@ class HomeView extends ConsumerWidget {
                       Expanded(
                         child: _buildStatCard(
                           context,
-                          'Delayed',
+                          l10n?.delayed ?? 'Delayed',
                           '$delayedCount',
                           Icons.warning_amber_rounded,
                           AppTheme.dangerColor,
@@ -137,7 +146,7 @@ class HomeView extends ConsumerWidget {
                       Expanded(
                         child: _buildStatCard(
                           context,
-                          'On-Time',
+                          l10n?.onTime ?? 'On-Time',
                           '$onTimeCount',
                           Icons.check_circle_outline,
                           AppTheme.successColor,
@@ -158,7 +167,7 @@ class HomeView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Quick Menu',
+                    l10n?.quickMenu ?? 'Quick Menu',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -167,24 +176,27 @@ class HomeView extends ConsumerWidget {
                   const SizedBox(height: 12),
                   _buildMenuCard(
                     context,
-                    'Prediction History',
-                    'View your past delay prediction results and parameter entries.',
+                    l10n?.predictionHistory ?? 'Prediction History',
+                    l10n?.predictionHistoryDesc ??
+                        'View your past delay prediction results and parameter entries.',
                     Icons.history,
                     AppTheme.infoColor,
                     () => context.push('/history'),
                   ),
                   _buildMenuCard(
                     context,
-                    'Server Configuration',
-                    'Configure server endpoints and verify host availability.',
+                    l10n?.serverConfiguration ?? 'Server Configuration',
+                    l10n?.serverConfigurationDesc ??
+                        'Configure server endpoints and verify host availability.',
                     Icons.lan_outlined,
                     AppTheme.warningColor,
                     () => context.push('/settings'),
                   ),
                   _buildMenuCard(
                     context,
-                    'Information Center',
-                    'Learn about aviation terms, weather variables, FAQs, and system operations.',
+                    l10n?.informationCenter ?? 'Information Center',
+                    l10n?.informationCenterDesc ??
+                        'Learn about aviation terms, weather variables, FAQs, and system operations.',
                     Icons.info_outline,
                     AppTheme.primaryColor,
                     () => context.push('/info'),
@@ -200,14 +212,22 @@ class HomeView extends ConsumerWidget {
   }
 
   Widget _buildStatCard(
-      BuildContext context, String label, String value, IconData icon, Color color) {
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     final theme = Theme.of(context);
     return Card(
       elevation: 0,
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.08), width: 1.5),
+        side: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+          width: 1.5,
+        ),
       ),
       margin: const EdgeInsets.all(4.0),
       child: Padding(
@@ -218,17 +238,14 @@ class HomeView extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -238,8 +255,14 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuCard(BuildContext context, String title, String subtitle, IconData icon,
-      Color iconColor, VoidCallback onTap) {
+  Widget _buildMenuCard(
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color iconColor,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6.0),
@@ -247,7 +270,10 @@ class HomeView extends ConsumerWidget {
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.08), width: 1.5),
+        side: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+          width: 1.5,
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -259,7 +285,7 @@ class HomeView extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: iconColor, size: 28),
@@ -281,7 +307,7 @@ class HomeView extends ConsumerWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 13,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         height: 1.3,
                       ),
                     ),
@@ -291,7 +317,7 @@ class HomeView extends ConsumerWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
               ),
             ],
           ),

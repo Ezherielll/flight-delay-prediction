@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class LoadingDialog extends StatelessWidget {
-  final String message;
+  final String? message;
 
-  const LoadingDialog({Key? key, this.message = 'Estimating flight delay...'})
-      : super(key: key);
+  const LoadingDialog({super.key, this.message});
 
-  static void show(BuildContext context, {String message = 'Estimating flight delay...'}) {
+  static void show(BuildContext context, {String? message}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -25,6 +25,10 @@ class LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final displayMessage =
+        message ?? l10n?.estimatingDelay ?? 'Estimating flight delay...';
+
     return PopScope(
       canPop: false,
       child: Dialog(
@@ -43,7 +47,7 @@ class LoadingDialog extends StatelessWidget {
               const SizedBox(width: 24),
               Expanded(
                 child: Text(
-                  message,
+                  displayMessage,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
