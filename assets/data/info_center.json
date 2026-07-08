@@ -1,0 +1,205 @@
+{
+  "about": {
+    "purpose": "This application provides real-time flight delay estimations by combining historical operational flight data with live meteorology reports. It assists dispatchers, pilots, and movement control teams in anticipating scheduling issues.",
+    "importance": "Flight delays propagate through airline networks, inflating operational costs and disrupting passenger plans. Predicting delays beforehand helps in proactive re-routing, fuel optimization, and gate scheduling.",
+    "ml_usage": "By training machine learning classifiers on hundreds of thousands of past flights and corresponding hourly local weather conditions, the system learns complex, non-linear relationships that trigger operational holds.",
+    "data_sources": [
+      "Flight operational logs (movement types, airline codes, schedules)",
+      "Open-Meteo API hourly historical and real-time weather datasets"
+    ]
+  },
+  "classification": {
+    "on_time": "The flight is expected to depart or arrive within 30 minutes of its scheduled time.",
+    "delay": "The flight is expected to deviate from its scheduled time by 30 minutes or more.",
+    "definition": "A flight is officially classified as 'Delayed' if its Actual Time of Departure (ATD) is 30 minutes or more after its Scheduled Time of Departure (STD)."
+  },
+  "airlines": [
+    { "code": "GA", "name": "Garuda Indonesia", "country": "Indonesia" },
+    { "code": "JT", "name": "Lion Air", "country": "Indonesia" },
+    { "code": "ID", "name": "Batik Air", "country": "Indonesia" },
+    { "code": "IW", "name": "Wings Air", "country": "Indonesia" },
+    { "code": "QZ", "name": "AirAsia Indonesia", "country": "Indonesia" },
+    { "code": "AK", "name": "AirAsia Malaysia", "country": "Malaysia" },
+    { "code": "SQ", "name": "Singapore Airlines", "country": "Singapore" },
+    { "code": "MH", "name": "Malaysia Airlines", "country": "Malaysia" },
+    { "code": "TR", "name": "Scoot", "country": "Singapore" },
+    { "code": "OD", "name": "Batik Air Malaysia", "country": "Malaysia" }
+  ],
+  "airports": [
+    { "iata": "KNO", "name": "Kualanamu International Airport", "city": "Medan", "country": "Indonesia" },
+    { "iata": "CGK", "name": "Soekarno-Hatta International Airport", "city": "Jakarta", "country": "Indonesia" },
+    { "iata": "SIN", "name": "Singapore Changi Airport", "city": "Singapore", "country": "Singapore" },
+    { "iata": "KUL", "name": "Kuala Lumpur International Airport", "city": "Kuala Lumpur", "country": "Malaysia" },
+    { "iata": "DPS", "name": "Ngurah Rai International Airport", "city": "Denpasar", "country": "Indonesia" },
+    { "iata": "SUB", "name": "Juanda International Airport", "city": "Surabaya", "country": "Indonesia" }
+  ],
+  "weather_parameters": [
+    {
+      "name": "Temperature",
+      "unit": "Celsius (°C)",
+      "description": "The ambient atmospheric temperature measured 2 meters above ground level.",
+      "impact": "High heat reduces air density, decreasing lift and engine thrust. This forces aircraft weight restrictions, potentially causing cargo-loading delays."
+    },
+    {
+      "name": "Visibility",
+      "unit": "meters (m)",
+      "description": "The horizontal distance at which objects can be clearly seen and identified by pilots or controllers.",
+      "impact": "Low visibility below airport minimums halts visual flight operations, forcing instrument approaches with wider separations, directly causing backlogs."
+    },
+    {
+      "name": "Wind Speed",
+      "unit": "km/h",
+      "description": "The rate of air movement measured horizontally at 10 meters and 100 meters above the runway.",
+      "impact": "High wind speeds, especially crosswinds exceeding aircraft structural limits, suspend runway operations or force aircraft to hold."
+    },
+    {
+      "name": "Wind Direction",
+      "unit": "degrees (°)",
+      "description": "The compass heading from which the wind originates (0° = North, 180° = South).",
+      "impact": "Crucial for runway configuration. Tailwind components force changes in active runway headings, delaying taxi and departure schedules."
+    },
+    {
+      "name": "Precipitation",
+      "unit": "millimeters (mm)",
+      "description": "The depth of liquid water (rain) falling on the ground over a specific hour.",
+      "impact": "Heavy rain degrades visibility, causes water accumulation on runway surfaces (hydroplaning risk), and interrupts ground handling operations."
+    },
+    {
+      "name": "Humidity",
+      "unit": "percentage (%)",
+      "description": "The amount of water vapor present in the air relative to the maximum capacity at that temperature.",
+      "impact": "High relative humidity combined with temperature shifts leads to early fog formation, severely reducing runway visual range."
+    },
+    {
+      "name": "Surface Pressure",
+      "unit": "hectopascals (hPa)",
+      "description": "The atmospheric pressure measured directly at the airport surface level.",
+      "impact": "Low pressure systems represent storms, unstable weather, and turbulence, while high pressure systems generally represent stable conditions."
+    },
+    {
+      "name": "Cloud Cover",
+      "unit": "percentage (%)",
+      "description": "The fraction of the sky obscured by clouds, categorized by Low, Mid, and High altitude cover.",
+      "impact": "Low-level clouds block instrument approaches and glide paths, whereas high-level clouds have negligible impact on ground operations."
+    },
+    {
+      "name": "Weather Code",
+      "unit": "WMO Code",
+      "description": "World Meteorological Organization numeric code representing specific weather descriptors (e.g. thunderstorm, drizzle, fog).",
+      "impact": "Instantly categorizes general severity. Active thunderstorms (Codes 95-99) or heavy freezing drizzle suspend all ground actions."
+    }
+  ],
+  "weather_severity": {
+    "visibility": [
+      { "level": "Excellent", "range": "> 10,000 m", "description": "Unrestricted visual flights." },
+      { "level": "Good", "range": "5,000 m - 10,000 m", "description": "Normal visual airport operations." },
+      { "level": "Moderate", "range": "2,000 m - 5,000 m", "description": "Caution advised. Marginal visual operations." },
+      { "level": "Poor", "range": "800 m - 2,000 m", "description": "Instrument landing system (ILS) required." },
+      { "level": "Critical", "range": "< 800 m", "description": "Severe delays. Approaching runway shutdown limits." }
+    ],
+    "wind_speed": [
+      { "level": "Calm", "range": "< 10 km/h", "description": "Ideal flight conditions." },
+      { "level": "Light", "range": "10 - 20 km/h", "description": "Easy operational handling." },
+      { "level": "Moderate", "range": "20 - 35 km/h", "description": "Slight turbulence. Runway adjustments possible." },
+      { "level": "Strong", "range": "35 - 50 km/h", "description": "Crosswind alerts. Ground crew holds possible." },
+      { "level": "Very Strong", "range": "> 50 km/h", "description": "Severe crosswinds. Expect diversions or suspensions." }
+    ],
+    "rain": [
+      { "level": "No Rain", "range": "0 mm", "description": "Dry runways." },
+      { "level": "Light Rain", "range": "< 2 mm/hr", "description": "Wet surfaces. Standard operations." },
+      { "level": "Moderate Rain", "range": "2 - 8 mm/hr", "description": "Increased stopping distances. Visibility reduced." },
+      { "level": "Heavy Rain", "range": "> 8 mm/hr", "description": "Hydroplaning hazard. Interrupts baggage loading." }
+    ]
+  },
+  "prediction_guide": {
+    "on_time_meaning": "The model calculates a low probability of departure delay. Under the selected parameters, normal timelines are highly likely.",
+    "delay_meaning": "The model calculates a high probability of a departure delay exceeding 30 minutes. Operational adjustments are recommended.",
+    "confidence_expl": "The probability percentage indicates the model's mathematical confidence in the predicted class. For example, a 92% delay probability means the model is extremely certain that operational parameters align with past historical delay patterns."
+  },
+  "ml_models": [
+    {
+      "name": "Decision Tree",
+      "advantages": [
+        "Highly intuitive rules that can be visualized as a flowchart",
+        "Extremely fast inference speeds",
+        "Directly maps decisions based on sequential feature splitting"
+      ]
+    },
+    {
+      "name": "XGBoost",
+      "advantages": [
+        "Ensemble boosting algorithm creating hundreds of trees sequentially",
+        "Highest predictive accuracy and robust generalization on unseen patterns",
+        "Identifies fine-grained non-linear weather interactions"
+      ]
+    }
+  ],
+  "feature_importance": {
+    "intro": "Not every atmospheric or operational metric influences flight schedules equally. The machine learning model weighs features based on historical correlations.",
+    "top_features": [
+      { "feature": "Visibility", "impact": "Highest impact. Poor visibility blocks landings and departures completely." },
+      { "feature": "Rainfall Volume", "impact": "High impact. Wet runways increase braking distances and slow down ground handling." },
+      { "feature": "Wind Speed", "impact": "Moderate impact. Affects structural crosswind safety margins." },
+      { "feature": "Temperature", "impact": "Slight impact. Affects engine thrust performance on hot days." }
+    ]
+  },
+  "faq": [
+    {
+      "question": "What is classified as a flight delay in this system?",
+      "answer": "A flight delay is defined as any departure occurring 30 minutes or more after its scheduled departure time (STD)."
+    },
+    {
+      "question": "Why can weather cause flight delays?",
+      "answer": "Severe weather conditions such as heavy rainfall, low visibility, and high winds jeopardize flight safety. Air Traffic Control (ATC) increases spacing between flights, slowing down operations, while ground crews may halt ramp actions."
+    },
+    {
+      "question": "Why doesn't every rainy day cause delays?",
+      "answer": "Light rain or rain with excellent visibility and calm winds is easily manageable. Delays usually happen when rain is heavy, runway surfaces accumulate water, visibility drops below landing minimums, or strong winds occur simultaneously."
+    },
+    {
+      "question": "Why is the prediction output sometimes different from reality?",
+      "answer": "Machine learning models predict based on historical statistics and weather forecasts. They cannot anticipate unpredictable events such as unscheduled maintenance, late-arriving crew, medical emergencies, or sudden ATC issues."
+    },
+    {
+      "question": "How accurate is the prediction model?",
+      "answer": "The tuned XGBoost model achieves an accuracy of approximately 85% to 90% on testing datasets. This accuracy may vary depending on the precision of incoming weather forecasts."
+    },
+    {
+      "question": "Can administrators retrain the model?",
+      "answer": "Yes. Admin users can upload new historical logs (operational flight logs and local METAR weather indices) to trigger a automated pipeline run that retrains and deploys updated model files."
+    },
+    {
+      "question": "How often should the model be retrained?",
+      "answer": "Retraining is typically performed quarterly or during season changes (e.g. wet season vs dry season) to capture shifting monsoon wind patterns and changes in baseline schedules."
+    }
+  ],
+  "workflow": [
+    { "step": "1", "name": "Flight Data", "desc": "Input scheduled airline, flight operation type, hour, and date info." },
+    { "step": "2", "name": "Weather Data", "desc": "Fetch live ambient weather metrics (wind, rain, clouds, visibility) from forecast models." },
+    { "step": "3", "name": "Preprocessing", "desc": "Calculate derived ratios (e.g. wind gust ratios, rain-cloud indices) to align features." },
+    { "step": "4", "name": "ML Model", "desc": "Run calculations through the trained XGBoost or Decision Tree classifiers." },
+    { "step": "5", "name": "Prediction Result", "desc": "Evaluate outcomes, mapping outputs to On-Time or Delay with confidence probabilities." },
+    { "step": "6", "name": "Dashboard", "desc": "Render formatted summaries, color badges, and warning notes on the screen." }
+  ],
+  "glossary": [
+    { "term": "AMC (Apron Movement Control)", "definition": "The airport authority unit responsible for regulating runway gate parking, pushback clearances, and aircraft taxi operations on the apron." },
+    { "term": "ETA (Estimated Time of Arrival)", "definition": "The predicted timestamp at which an aircraft will land on the runway." },
+    { "term": "ETD (Estimated Time of Departure)", "definition": "The predicted timestamp at which an aircraft will begin its pushback from the parking bay." },
+    { "term": "STD (Scheduled Time of Departure)", "definition": "The official, timetabled departure time published by the airline." },
+    { "term": "ATD (Actual Time of Departure)", "definition": "The exact timestamp when an aircraft breaks contact with the gate or starts taxiing for takeoff." },
+    { "term": "IATA Code", "definition": "A 3-letter code designating airports worldwide (e.g., KNO for Kualanamu, CGK for Soekarno-Hatta) or a 2-letter code for airlines (e.g., GA for Garuda)." },
+    { "term": "ICAO Code", "definition": "A 4-letter airport indicator (e.g. WIMM for Kualanamu) or 3-letter airline indicator (e.g. GIA for Garuda) used by pilots and air traffic control." },
+    { "term": "Runway", "definition": "A defined rectangular area on a land aerodrome prepared for the landing and takeoff of aircraft." },
+    { "term": "Taxiway", "definition": "A paved path at an airport connecting runways with aprons, hangars, and terminals, used for aircraft taxiing." },
+    { "term": "Apron", "definition": "Also called the ramp, this is the area where aircraft are parked, loaded, unloaded, refueled, or boarded." },
+    { "term": "Pushback", "definition": "An operational procedure where an aircraft is pushed backward away from an airport gate by external tug power." },
+    { "term": "Ground Handling", "definition": "Services provided to aircraft while parked at terminal gates, including baggage handling, refueling, catering, and cabin cleaning." },
+    { "term": "Meteorology", "definition": "The branch of science concerned with the processes and phenomena of the atmosphere, especially as a means of forecasting the weather." },
+    { "term": "Machine Learning", "definition": "A subfield of artificial intelligence focused on building algorithms that learn patterns from datasets to make automated decisions." },
+    { "term": "Decision Tree", "definition": "A supervised machine learning model that maps parameters to predictions using hierarchical logical branching rules." },
+    { "term": "XGBoost", "definition": "An optimized gradient boosting machine learning library that combines hundreds of simple decision trees to yield high performance." },
+    { "term": "ROC-AUC", "definition": "Receiver Operating Characteristic - Area Under Curve. A statistical metric used to measure classification model discriminative performance." },
+    { "term": "Precision / Recall / F1 Score", "definition": "Evaluation metrics: Precision measures positive predictive accuracy, Recall measures detection rate, and F1 Score combines both into a single harmonic mean." },
+    { "term": "Confusion Matrix", "definition": "A table layout used to visualize the performance of a classification algorithm by comparing actual values with predicted outcomes." }
+  ]
+}

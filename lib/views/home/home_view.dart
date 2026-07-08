@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../viewmodels/prediction_viewmodel.dart';
 import '../../viewmodels/settings_viewmodel.dart';
 import '../../core/theme/theme.dart';
+import '../../widgets/app_drawer.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class HomeView extends ConsumerWidget {
     final onTimeCount = totalPredictions - delayedCount;
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Flight Delay Estimator'),
         actions: [
@@ -178,6 +180,14 @@ class HomeView extends ConsumerWidget {
                     Icons.lan_outlined,
                     AppTheme.warningColor,
                     () => context.push('/settings'),
+                  ),
+                  _buildMenuCard(
+                    context,
+                    'Information Center',
+                    'Learn about aviation terms, weather variables, FAQs, and system operations.',
+                    Icons.info_outline,
+                    AppTheme.primaryColor,
+                    () => context.push('/info'),
                   ),
                 ],
               ),

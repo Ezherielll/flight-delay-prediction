@@ -9,6 +9,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_dropdown.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/loading_dialog.dart';
+import '../../widgets/app_drawer.dart';
 
 class PredictionView extends ConsumerStatefulWidget {
   const PredictionView({Key? key}) : super(key: key);
@@ -346,6 +347,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     final theme = Theme.of(context);
     
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Flight Details & Forecast'),
       ),

@@ -56,7 +56,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             notifier.resetConnectionStatus();
-            context.pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
           },
         ),
       ),

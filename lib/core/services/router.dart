@@ -7,6 +7,7 @@ import '../../views/prediction/prediction_view.dart';
 import '../../views/result/result_view.dart';
 import '../../views/history/history_view.dart';
 import '../../views/settings/settings_view.dart';
+import '../../views/info/info_center_view.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -45,6 +46,12 @@ final GoRouter router = GoRouter(
       path: '/settings',
       builder: (BuildContext context, GoRouterState state) {
         return const SettingsView();
+      },
+    ),
+    GoRoute(
+      path: '/info',
+      builder: (BuildContext context, GoRouterState state) {
+        return const InfoCenterView();
       },
     ),
   ],

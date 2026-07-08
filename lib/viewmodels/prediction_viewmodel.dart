@@ -41,19 +41,19 @@ class PredictionState {
 }
 
 // 2. Prediction Notifier
-class PredictionNotifier extends StateNotifier<PredictionState> {
-  final ApiService _apiService;
-  final StorageService _storageService;
-
-  PredictionNotifier(this._apiService, this._storageService)
-      : super(PredictionState()) {
-    _loadHistory();
+class PredictionNotifier extends Notifier<PredictionState> {
+  @override
+  PredictionState build() {
+    final state = PredictionState();
+    Future.microtask(() => _loadHistory());
+    return state;
   }
 
   // Load history from shared preferences
   void _loadHistory() {
     try {
-      final rawList = _storageService.getHistoryRaw();
+      final storageService = ref.read(storageServiceProvider);
+      final rawList = storageService.getHistoryRaw();
       final historyItems = rawList.map((itemStr) {
         final Map<String, dynamic> jsonMap = jsonDecode(itemStr);
         return HistoryItem.fromJson(jsonMap);
@@ -67,10 +67,12 @@ class PredictionNotifier extends StateNotifier<PredictionState> {
 
   // Perform prediction request
   Future<bool> runPrediction(PredictionRequest request) async {
+    final apiService = ref.read(apiServiceProvider);
+    final storageService = ref.read(storageServiceProvider);
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final responseMap = await _apiService.predict(request.toJson());
+      final responseMap = await apiService.predict(request.toJson());
       final predictionResponse = PredictionResponse.fromJson(responseMap);
 
       // Create history item
@@ -82,7 +84,7 @@ class PredictionNotifier extends StateNotifier<PredictionState> {
 
       // Save to SharedPreferences
       final historyJson = jsonEncode(historyItem.toJson());
-      await _storageService.addHistoryItem(historyJson);
+      await storageService.addHistoryItem(historyJson);
 
       // Update state with result and updated history list
       final updatedHistory = List<HistoryItem>.from(state.history)..insert(0, historyItem);
@@ -111,21 +113,21 @@ class PredictionNotifier extends StateNotifier<PredictionState> {
 
   // Remove single history item
   Future<void> deleteHistoryItem(int index) async {
-    await _storageService.removeHistoryItem(index);
+    final storageService = ref.read(storageServiceProvider);
+    await storageService.removeHistoryItem(index);
     final updatedList = List<HistoryItem>.from(state.history)..removeAt(index);
     state = state.copyWith(history: updatedList);
   }
 
   // Clear all history
   Future<void> clearAllHistory() async {
-    await _storageService.clearHistory();
+    final storageService = ref.read(storageServiceProvider);
+    await storageService.clearHistory();
     state = state.copyWith(history: []);
   }
 }
 
 // 3. Prediction Provider
-final predictionProvider = StateNotifierProvider<PredictionNotifier, PredictionState>((ref) {
-  final apiService = ref.watch(apiServiceProvider);
-  final storageService = ref.watch(storageServiceProvider);
-  return PredictionNotifier(apiService, storageService);
+final predictionProvider = NotifierProvider<PredictionNotifier, PredictionState>(() {
+  return PredictionNotifier();
 });

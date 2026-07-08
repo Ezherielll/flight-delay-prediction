@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../viewmodels/prediction_viewmodel.dart';
 import '../../widgets/prediction_card.dart';
 import '../../core/theme/theme.dart';
+import '../../widgets/app_drawer.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class HistoryView extends ConsumerWidget {
     final notifier = ref.read(predictionProvider.notifier);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Estimation History'),
         actions: [

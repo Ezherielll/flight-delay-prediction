@@ -52,22 +52,24 @@ class SettingsState {
 }
 
 // 3. Settings Notifier
-class SettingsNotifier extends StateNotifier<SettingsState> {
-  final StorageService _storageService;
-  final ApiService _apiService;
-
-  SettingsNotifier(this._storageService, this._apiService)
-      : super(SettingsState(
-          isDarkMode: _storageService.isDarkMode(),
-          baseUrl: _storageService.getBaseUrl(),
-        ));
+class SettingsNotifier extends Notifier<SettingsState> {
+  @override
+  SettingsState build() {
+    final storageService = ref.watch(storageServiceProvider);
+    return SettingsState(
+      isDarkMode: storageService.isDarkMode(),
+      baseUrl: storageService.getBaseUrl(),
+    );
+  }
 
   Future<void> toggleTheme(bool enabled) async {
-    await _storageService.setDarkMode(enabled);
+    final storageService = ref.read(storageServiceProvider);
+    await storageService.setDarkMode(enabled);
     state = state.copyWith(isDarkMode: enabled);
   }
 
   Future<void> updateBaseUrl(String url) async {
+    final storageService = ref.read(storageServiceProvider);
     String formattedUrl = url.trim();
     if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
       formattedUrl = 'http://$formattedUrl';
@@ -76,14 +78,15 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     if (formattedUrl.endsWith('/')) {
       formattedUrl = formattedUrl.substring(0, formattedUrl.length - 1);
     }
-    await _storageService.setBaseUrl(formattedUrl);
+    await storageService.setBaseUrl(formattedUrl);
     state = state.copyWith(baseUrl: formattedUrl, isConnected: null);
   }
 
   Future<void> testConnection() async {
+    final apiService = ref.read(apiServiceProvider);
     state = state.copyWith(isTestingConnection: true, isConnected: null);
     try {
-      final success = await _apiService.checkHealth();
+      final success = await apiService.checkHealth();
       state = state.copyWith(
         isTestingConnection: false,
         isConnected: success,
@@ -104,8 +107,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 }
 
 // 4. Settings Provider
-final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
-  final storageService = ref.watch(storageServiceProvider);
-  final apiService = ref.watch(apiServiceProvider);
-  return SettingsNotifier(storageService, apiService);
+final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(() {
+  return SettingsNotifier();
 });
