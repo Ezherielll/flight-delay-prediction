@@ -2,11 +2,10 @@ class PredictionRequest {
   final String airline;
   final String movementType;
   final String fltType;
+
+  // New: date replaces dayOfWeek, month, isWeekend, dayOfMonth
+  final String date; // ISO format: "2025-08-21"
   final int hour;
-  final int dayOfWeek;
-  final int month;
-  final int isWeekend;
-  final int? dayOfMonth;
 
   // Weather fields
   final double temperature2m;
@@ -23,9 +22,8 @@ class PredictionRequest {
   final double windDirection100m;
   final double windGusts10m;
 
-  // Optional derived/pipeline parameters
-  final double? windGustRatio;
-  final double? rainCloudInteraction;
+  // Optional pipeline parameters
+  // Note: windGustRatio and rainCloudInteraction are now computed server-side
   final String? acType;
   final String? origin;
   final String? destination;
@@ -35,11 +33,8 @@ class PredictionRequest {
     required this.airline,
     required this.movementType,
     required this.fltType,
+    required this.date,
     required this.hour,
-    required this.dayOfWeek,
-    required this.month,
-    required this.isWeekend,
-    this.dayOfMonth,
     required this.temperature2m,
     required this.relativeHumidity2m,
     required this.rain,
@@ -53,8 +48,6 @@ class PredictionRequest {
     required this.windDirection10m,
     required this.windDirection100m,
     required this.windGusts10m,
-    this.windGustRatio,
-    this.rainCloudInteraction,
     this.acType,
     this.origin,
     this.destination,
@@ -66,10 +59,8 @@ class PredictionRequest {
       'airline': airline,
       'movement_type': movementType,
       'flt_type': fltType,
+      'date': date,
       'hour': hour,
-      'day_of_week': dayOfWeek,
-      'month': month,
-      'is_weekend': isWeekend,
       'temperature_2m': temperature2m,
       'relative_humidity_2m': relativeHumidity2m,
       'rain': rain,
@@ -85,11 +76,6 @@ class PredictionRequest {
       'wind_gusts_10m': windGusts10m,
     };
 
-    if (dayOfMonth != null) data['day_of_month'] = dayOfMonth;
-    if (windGustRatio != null) data['wind_gust_ratio'] = windGustRatio;
-    if (rainCloudInteraction != null) {
-      data['rain_cloud_interaction'] = rainCloudInteraction;
-    }
     if (acType != null) data['ac_type'] = acType;
     if (origin != null) data['origin'] = origin;
     if (destination != null) data['destination'] = destination;
@@ -103,11 +89,8 @@ class PredictionRequest {
       airline: json['airline'] as String,
       movementType: json['movement_type'] as String,
       fltType: json['flt_type'] as String,
+      date: json['date'] as String,
       hour: json['hour'] as int,
-      dayOfWeek: json['day_of_week'] as int,
-      month: json['month'] as int,
-      isWeekend: json['is_weekend'] as int,
-      dayOfMonth: json['day_of_month'] as int?,
       temperature2m: (json['temperature_2m'] as num).toDouble(),
       relativeHumidity2m: (json['relative_humidity_2m'] as num).toDouble(),
       rain: (json['rain'] as num).toDouble(),
@@ -121,8 +104,6 @@ class PredictionRequest {
       windDirection10m: (json['wind_direction_10m'] as num).toDouble(),
       windDirection100m: (json['wind_direction_100m'] as num).toDouble(),
       windGusts10m: (json['wind_gusts_10m'] as num).toDouble(),
-      windGustRatio: (json['wind_gust_ratio'] as num?)?.toDouble(),
-      rainCloudInteraction: (json['rain_cloud_interaction'] as num?)?.toDouble(),
       acType: json['ac_type'] as String?,
       origin: json['origin'] as String?,
       destination: json['destination'] as String?,

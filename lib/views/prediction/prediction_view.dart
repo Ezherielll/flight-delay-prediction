@@ -25,7 +25,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   // Flight Controllers & Dropdowns
   String? _selectedAirline;
   String? _selectedMovementType;
-  String? _selectedFltType;
+  String? _selectedFltType = 'schedule';
 
   final List<String> _airlines = ['GA', 'QG', 'JT', 'ID', 'IW', 'QZ', 'SJ', 'Other'];
   final List<Map<String, String>> _movementTypes = [
@@ -35,46 +35,25 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     {'label': 'Arrival RON', 'value': 'arr_ron'},
   ];
   final List<Map<String, String>> _fltTypes = [
-    {'label': 'Commercial / Schedule', 'value': 'commercial'},
+    {'label': 'Commercial / Schedule', 'value': 'schedule'},
     {'label': 'Charter', 'value': 'charter'},
     {'label': 'Ferry Flight', 'value': 'ferry'},
-    {'label': 'Extra Flight', 'value': 'extra'},
-    {'label': 'Unscheduled', 'value': 'unscheduled'},
+    {'label': 'Extra Flight', 'value': 'extra flight'},
+    {'label': 'Unscheduled', 'value': 'unschedule'},
     {'label': 'Freighter', 'value': 'freighter'},
     {'label': 'Military', 'value': 'military'},
     {'label': 'RON', 'value': 'ron'},
+    {'label': 'Divert', 'value': 'divert'},
+    {'label': 'Tech Landing', 'value': 'tech landing'},
+    {'label': 'State / VIP Flight', 'value': 'state flight'},
+    {'label': 'Hajj Flight', 'value': 'hajj'},
   ];
 
-  // Time Dropdowns & Switch
+  // Time: date picker + hour dropdown
+  DateTime? _selectedDate;
   int? _selectedHour;
-  int? _selectedDayOfWeek;
-  int? _selectedMonth;
-  bool _isWeekend = false;
 
   final List<int> _hours = List.generate(24, (i) => i);
-  final List<Map<String, dynamic>> _daysOfWeek = [
-    {'label': 'Monday', 'value': 0},
-    {'label': 'Tuesday', 'value': 1},
-    {'label': 'Wednesday', 'value': 2},
-    {'label': 'Thursday', 'value': 3},
-    {'label': 'Friday', 'value': 4},
-    {'label': 'Saturday', 'value': 5},
-    {'label': 'Sunday', 'value': 6},
-  ];
-  final List<Map<String, dynamic>> _months = [
-    {'label': 'January', 'value': 1},
-    {'label': 'February', 'value': 2},
-    {'label': 'March', 'value': 3},
-    {'label': 'April', 'value': 4},
-    {'label': 'May', 'value': 5},
-    {'label': 'June', 'value': 6},
-    {'label': 'July', 'value': 7},
-    {'label': 'August', 'value': 8},
-    {'label': 'September', 'value': 9},
-    {'label': 'October', 'value': 10},
-    {'label': 'November', 'value': 11},
-    {'label': 'December', 'value': 12},
-  ];
 
   // Weather Controllers
   final _tempController = TextEditingController();
@@ -136,21 +115,20 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
         (_selectedAirline != 'Other' || _customAirlineController.text.trim().isNotEmpty);
     final movementOk = _selectedMovementType != null;
     final fltOk = _selectedFltType != null;
+    final dateOk = _selectedDate != null;
     final hourOk = _selectedHour != null;
-    final dayOk = _selectedDayOfWeek != null;
-    final monthOk = _selectedMonth != null;
 
     final tempVal = double.tryParse(_tempController.text);
-    final tempOk = tempVal != null && tempVal >= -50 && tempVal <= 60;
+    final tempOk = tempVal != null && tempVal >= -20 && tempVal <= 50;
 
     final humVal = double.tryParse(_humidityController.text);
     final humOk = humVal != null && humVal >= 0 && humVal <= 100;
 
     final rainVal = double.tryParse(_rainController.text);
-    final rainOk = rainVal != null && rainVal >= 0 && rainVal <= 500;
+    final rainOk = rainVal != null && rainVal >= 0 && rainVal <= 300;
 
     final pressVal = double.tryParse(_pressureController.text);
-    final pressOk = pressVal != null && pressVal >= 0 && pressVal <= 1100;
+    final pressOk = pressVal != null && pressVal >= 850 && pressVal <= 1100;
 
     final ccVal = double.tryParse(_cloudCoverController.text);
     final ccOk = ccVal != null && ccVal >= 0 && ccVal <= 100;
@@ -165,10 +143,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     final cchOk = cchVal != null && cchVal >= 0 && cchVal <= 100;
 
     final ws10Val = double.tryParse(_windSpeed10mController.text);
-    final ws10Ok = ws10Val != null && ws10Val >= 0 && ws10Val <= 200;
+    final ws10Ok = ws10Val != null && ws10Val >= 0 && ws10Val <= 30;
 
     final ws100Val = double.tryParse(_windSpeed100mController.text);
-    final ws100Ok = ws100Val != null && ws100Val >= 0 && ws100Val <= 300;
+    final ws100Ok = ws100Val != null && ws100Val >= 0 && ws100Val <= 50;
 
     final wd10Val = double.tryParse(_windDir10mController.text);
     final wd10Ok = wd10Val != null && wd10Val >= 0 && wd10Val <= 360;
@@ -177,14 +155,13 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     final wd100Ok = wd100Val != null && wd100Val >= 0 && wd100Val <= 360;
 
     final wgVal = double.tryParse(_windGustsController.text);
-    final wgOk = wgVal != null && wgVal >= 0 && wgVal <= 300;
+    final wgOk = wgVal != null && wgVal >= 0 && wgVal <= 200;
 
     final isValid = airlineOk &&
         movementOk &&
         fltOk &&
+        dateOk &&
         hourOk &&
-        dayOk &&
-        monthOk &&
         tempOk &&
         humOk &&
         rainOk &&
@@ -287,14 +264,17 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
         ? _customAirlineController.text.trim().toUpperCase()
         : _selectedAirline!;
 
+    // Format date to ISO string: YYYY-MM-DD
+    final d = _selectedDate!;
+    final dateStr =
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
     final request = PredictionRequest(
       airline: finalAirline,
       movementType: _selectedMovementType!,
       fltType: _selectedFltType!,
+      date: dateStr,
       hour: _selectedHour!,
-      dayOfWeek: _selectedDayOfWeek!,
-      month: _selectedMonth!,
-      isWeekend: _isWeekend ? 1 : 0,
       temperature2m: double.parse(_tempController.text),
       relativeHumidity2m: double.parse(_humidityController.text),
       rain: double.parse(_rainController.text),
@@ -454,90 +434,85 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                     children: [
                       const _CardTitle(title: 'Date & Time Settings', icon: Icons.access_time),
                       const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomDropdown<int>(
-                              label: 'Month',
-                              value: _selectedMonth,
-                              hint: 'Select',
-                              items: _months
-                                  .map((m) => DropdownMenuItem(
-                                        value: m['value'] as int,
-                                        child: Text(m['label'] as String),
-                                      ))
-                                  .toList(),
-                              onChanged: (val) {
-                                setState(() => _selectedMonth = val);
-                                _checkFormValidity();
-                              },
+                      // Date Picker
+                      InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2030, 12, 31),
+                          );
+                          if (picked != null) {
+                            setState(() => _selectedDate = picked);
+                            _checkFormValidity();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: _selectedDate == null
+                                  ? theme.colorScheme.outline
+                                  : theme.colorScheme.primary,
+                              width: _selectedDate == null ? 1 : 1.5,
                             ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: CustomDropdown<int>(
-                              label: 'Day of Week',
-                              value: _selectedDayOfWeek,
-                              hint: 'Select',
-                              items: _daysOfWeek
-                                  .map((d) => DropdownMenuItem(
-                                        value: d['value'] as int,
-                                        child: Text(d['label'] as String),
-                                      ))
-                                  .toList(),
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedDayOfWeek = val;
-                                  // Auto set weekend switch if Saturday (5) or Sunday (6)
-                                  if (val != null) {
-                                    _isWeekend = val == 5 || val == 6;
-                                  }
-                                });
-                                _checkFormValidity();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomDropdown<int>(
-                              label: 'Hour of Flight (0-23)',
-                              value: _selectedHour,
-                              hint: 'Select Hour',
-                              items: _hours
-                                  .map((h) => DropdownMenuItem(
-                                        value: h,
-                                        child: Text(h.toString().padLeft(2, '0')),
-                                      ))
-                                  .toList(),
-                              onChanged: (val) {
-                                setState(() => _selectedHour = val);
-                                _checkFormValidity();
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
-                              const Text(
-                                'Weekend Flight',
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: _selectedDate == null
+                                    ? theme.colorScheme.onSurface.withOpacity(0.5)
+                                    : theme.colorScheme.primary,
                               ),
-                              const SizedBox(height: 6),
-                              Switch(
-                                value: _isWeekend,
-                                onChanged: (val) {
-                                  setState(() => _isWeekend = val);
-                                  _checkFormValidity();
-                                },
-                                activeColor: theme.colorScheme.primary,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _selectedDate == null
+                                      ? 'Select Flight Date'
+                                      : '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: _selectedDate == null
+                                        ? theme.colorScheme.onSurface.withOpacity(0.5)
+                                        : theme.colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
+                              if (_selectedDate != null)
+                                Text(
+                                  _getDayLabel(_selectedDate!),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                             ],
                           ),
-                        ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Hour Dropdown
+                      CustomDropdown<int>(
+                        label: 'Hour of Flight (0–23)',
+                        value: _selectedHour,
+                        hint: 'Select Hour',
+                        prefixIcon: Icons.schedule,
+                        items: _hours
+                            .map((h) => DropdownMenuItem(
+                                  value: h,
+                                  child: Text('${h.toString().padLeft(2, '0')}:00'),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() => _selectedHour = val);
+                          _checkFormValidity();
+                        },
                       ),
                     ],
                   ),
@@ -587,7 +562,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               hint: 'e.g. 28.5',
                               suffixText: '°C',
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, -50, 60),
+                              validator: (val) => _validateRange(val, -20, 50),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -613,18 +588,19 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               hint: 'e.g. 3.5',
                               suffixText: 'mm',
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, 0, 500),
+                              validator: (val) => _validateRange(val, 0, 300),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: CustomTextField(
                               controller: _pressureController,
+                              // Surface pressure validator updated: 850–1100 hPa
                               label: 'Surf. Pressure',
                               hint: 'e.g. 1009',
                               suffixText: 'hPa',
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, 0, 1100),
+                              validator: (val) => _validateRange(val, 850, 1100),
                             ),
                           ),
                         ],
@@ -691,7 +667,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               hint: 'e.g. 17',
                               suffixText: 'km/h',
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, 0, 200),
+                              validator: (val) => _validateRange(val, 0, 150),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -702,7 +678,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                               hint: 'e.g. 21',
                               suffixText: 'km/h',
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              validator: (val) => _validateRange(val, 0, 300),
+                              validator: (val) => _validateRange(val, 0, 200),
                             ),
                           ),
                         ],
@@ -740,7 +716,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                         hint: 'e.g. 29',
                         suffixText: 'km/h',
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        validator: (val) => _validateRange(val, 0, 300),
+                        validator: (val) => _validateRange(val, 0, 200),
                       ),
                     ],
                   ),
@@ -775,6 +751,11 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
     );
+  }
+
+  String _getDayLabel(DateTime date) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days[date.weekday - 1];
   }
 
   String? _validateRange(String? value, double min, double max) {
