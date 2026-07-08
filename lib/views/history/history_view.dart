@@ -30,94 +30,198 @@ class HistoryView extends ConsumerWidget {
             ),
         ],
       ),
-      body: state.history.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: [
+          // Filter Bar
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                // Airline Filter Input
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: l10n?.appTitle != null ? 'Filter Airline (e.g. GA)' : 'Filter Airline...',
+                      prefixIcon: const Icon(Icons.flight),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      final airline = value.trim().isEmpty ? null : value.trim().toUpperCase();
+                      notifier.applyFilter(
+                        airline: airline,
+                        prediction: state.filterPrediction,
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Prediction Status Dropdown
+                DropdownButton<String>(
+                  value: state.filterPrediction,
+                  hint: const Text('All Status'),
+                  underline: const SizedBox(),
+                  icon: const Icon(Icons.filter_list),
+                  items: const [
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text('All Status'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Delayed',
+                      child: Text('Delayed'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'On-Time',
+                      child: Text('On-Time'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    notifier.applyFilter(
+                      airline: state.filterAirline,
+                      prediction: value,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          if (state.filterAirline != null || state.filterPrediction != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
                 children: [
-                  Icon(
-                    Icons.history,
-                    size: 72,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
-                  ),
-                  const SizedBox(height: 16),
                   Text(
-                    l10n?.noHistoryRecorded ?? 'No history recorded yet',
+                    'Active Filters: ',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n?.runDelayEstimationToLog ?? 'Run a flight delay estimation to log search data.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  if (state.filterAirline != null)
+                    Chip(
+                      label: Text('Airline: ${state.filterAirline}'),
+                      onDeleted: () {
+                        notifier.applyFilter(
+                          airline: null,
+                          prediction: state.filterPrediction,
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => context.push('/predict'),
-                    child: Text(l10n?.startPrediction ?? 'Start Prediction'),
+                  const SizedBox(width: 4),
+                  if (state.filterPrediction != null)
+                    Chip(
+                      label: Text('Status: ${state.filterPrediction}'),
+                      onDeleted: () {
+                        notifier.applyFilter(
+                          airline: state.filterAirline,
+                          prediction: null,
+                        );
+                      },
+                    ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => notifier.clearFilters(),
+                    child: const Text('Clear All'),
                   ),
                 ],
               ),
-            )
-          : ListView.builder(
-              itemCount: state.history.length,
-              itemBuilder: (context, index) {
-                final item = state.history[index];
-                
-                // Wrap in Dismissible for smooth swipe-to-delete animation
-                return Dismissible(
-                  key: Key('history_${item.timestamp.millisecondsSinceEpoch}_$index'),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) async {
-                    await notifier.deleteHistoryItem(index);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  background: Container(
-                    color: AppTheme.dangerColor,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 24.0),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 28,
+            ),
+          Expanded(
+            child: state.history.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.history,
+                          size: 72,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n?.noHistoryRecorded ?? 'No history recorded yet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n?.runDelayEstimationToLog ?? 'Run a flight delay estimation to log search data.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => context.push('/predict'),
+                          child: Text(l10n?.startPrediction ?? 'Start Prediction'),
+                        ),
+                      ],
                     ),
-                  ),
-                  child: PredictionCard(
-                    item: item,
-                    onDelete: () async {
-                      await notifier.deleteHistoryItem(index);
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
-                          duration: const Duration(seconds: 2),
+                  )
+                : ListView.builder(
+                    itemCount: state.history.length,
+                    itemBuilder: (context, index) {
+                      final item = state.history[index];
+                      
+                      // Wrap in Dismissible for smooth swipe-to-delete animation
+                      return Dismissible(
+                        key: Key('history_${item.timestamp.millisecondsSinceEpoch}_$index'),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) async {
+                          await notifier.deleteHistoryItem(index);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        background: Container(
+                          color: AppTheme.dangerColor,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 24.0),
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        child: PredictionCard(
+                          item: item,
+                          onDelete: () async {
+                            await notifier.deleteHistoryItem(index);
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          onTap: () {
+                            // Set as the current result and navigate to ResultView
+                            ref.read(predictionProvider.notifier).setLatestPrediction(
+                                  item.request,
+                                  item.response,
+                                );
+                            context.push('/result');
+                          },
                         ),
                       );
                     },
-                    onTap: () {
-                      // Set as the current result and navigate to ResultView
-                      ref.read(predictionProvider.notifier).setLatestPrediction(
-                            item.request,
-                            item.response,
-                          );
-                      context.push('/result');
-                    },
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
 
