@@ -143,10 +143,10 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     final cchOk = cchVal != null && cchVal >= 0 && cchVal <= 100;
 
     final ws10Val = double.tryParse(_windSpeed10mController.text);
-    final ws10Ok = ws10Val != null && ws10Val >= 0 && ws10Val <= 30;
+    final ws10Ok = ws10Val != null && ws10Val >= 0 && ws10Val <= 150;
 
     final ws100Val = double.tryParse(_windSpeed100mController.text);
-    final ws100Ok = ws100Val != null && ws100Val >= 0 && ws100Val <= 50;
+    final ws100Ok = ws100Val != null && ws100Val >= 0 && ws100Val <= 200;
 
     final wd10Val = double.tryParse(_windDir10mController.text);
     final wd10Ok = wd10Val != null && wd10Val >= 0 && wd10Val <= 360;
@@ -290,16 +290,19 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
       windGusts10m: double.parse(_windGustsController.text),
     );
 
+    if (!mounted) return;
     LoadingDialog.show(context);
 
     final success = await ref.read(predictionProvider.notifier).runPrediction(request);
 
+    if (!mounted) return;
     LoadingDialog.hide(context);
 
     if (success) {
       context.replace('/result');
     } else {
       final err = ref.read(predictionProvider).errorMessage;
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
