@@ -1,11 +1,27 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  static bool get _isTest {
+    try {
+      if (identical(0, 0.0)) {
+        // Safe check for JS/Web runtime
+        return false;
+      }
+      // kIsWeb is exported by package:flutter/foundation.dart, but is also available via material.dart
+      if (kIsWeb) return false;
+      return Platform.environment.containsKey('FLUTTER_TEST');
+    } catch (_) {
+      return false;
+    }
+  }
+
   // Brand colors
   static const Color primaryColor = Color(0xFF2563EB); // Modern Royal Blue
   static const Color secondaryColor = Color(0xFF0F172A); // Slate Blue/Dark Grey
-  
+
   static const Color successColor = Color(0xFF10B981); // Emerald Green
   static const Color dangerColor = Color(0xFFEF4444); // Vibrant Red
   static const Color warningColor = Color(0xFFF59E0B); // Amber Yellow
@@ -13,6 +29,19 @@ class AppTheme {
 
   // Card & Border Radius
   static const double cardRadius = 16.0;
+
+  // Utility to determine confidence color
+  static Color getConfidenceColor(String confidence) {
+    switch (confidence.toLowerCase()) {
+      case 'high':
+        return successColor;
+      case 'medium':
+        return warningColor;
+      case 'low':
+      default:
+        return dangerColor;
+    }
+  }
 
   // Light Theme Configuration
   static ThemeData get lightTheme {
@@ -28,13 +57,19 @@ class AppTheme {
         surfaceContainerLowest: Colors.white,
       ),
       scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-      textTheme: GoogleFonts.outfitTextTheme(ThemeData.light().textTheme).copyWith(
-        bodyMedium: GoogleFonts.inter(
-          textStyle: ThemeData.light().textTheme.bodyMedium?.copyWith(
+      textTheme: _isTest
+          ? ThemeData.light().textTheme.copyWith(
+              bodyMedium: ThemeData.light().textTheme.bodyMedium?.copyWith(
                 color: const Color(0xFF334155), // Slate-700
               ),
-        ),
-      ),
+            )
+          : GoogleFonts.outfitTextTheme(ThemeData.light().textTheme).copyWith(
+              bodyMedium: GoogleFonts.inter(
+                textStyle: ThemeData.light().textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF334155), // Slate-700
+                ),
+              ),
+            ),
       cardTheme: CardThemeData(
         elevation: 2,
         color: Colors.white,
@@ -63,10 +98,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(cardRadius),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -88,7 +120,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: dangerColor, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
         hintStyle: const TextStyle(color: Color(0xFF94A3B8)), // Slate-400
       ),
     );
@@ -108,13 +143,19 @@ class AppTheme {
         surfaceContainerLowest: const Color(0xFF1E293B),
       ),
       scaffoldBackgroundColor: const Color(0xFF0F172A),
-      textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
-        bodyMedium: GoogleFonts.inter(
-          textStyle: ThemeData.dark().textTheme.bodyMedium?.copyWith(
+      textTheme: _isTest
+          ? ThemeData.dark().textTheme.copyWith(
+              bodyMedium: ThemeData.dark().textTheme.bodyMedium?.copyWith(
                 color: const Color(0xFFCBD5E1), // Slate-300
               ),
-        ),
-      ),
+            )
+          : GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
+              bodyMedium: GoogleFonts.inter(
+                textStyle: ThemeData.dark().textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFCBD5E1), // Slate-300
+                ),
+              ),
+            ),
       cardTheme: CardThemeData(
         elevation: 2,
         color: const Color(0xFF1E293B), // Slate-800
@@ -143,10 +184,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(cardRadius),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -168,7 +206,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: dangerColor, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
         hintStyle: const TextStyle(color: Color(0xFF64748B)), // Slate-500
       ),
     );

@@ -178,7 +178,7 @@ class ResultView extends ConsumerWidget {
                             context,
                             'Confidence',
                             response.confidence,
-                            _getConfidenceColor(response.confidence),
+                            AppTheme.getConfidenceColor(response.confidence),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -381,17 +381,5 @@ class ResultView extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Color _getConfidenceColor(String confidence) {
-    switch (confidence.toLowerCase()) {
-      case 'high':
-        return AppTheme.successColor;
-      case 'medium':
-        return AppTheme.warningColor;
-      case 'low':
-      default:
-        return AppTheme.dangerColor;
-    }
   }
 }

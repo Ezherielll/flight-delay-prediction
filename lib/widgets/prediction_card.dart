@@ -106,7 +106,7 @@ class PredictionCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: _getConfidenceColor(
+                              color: AppTheme.getConfidenceColor(
                                 item.response.confidence,
                               ),
                             ),
@@ -146,17 +146,5 @@ class PredictionCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getConfidenceColor(String confidence) {
-    switch (confidence.toLowerCase()) {
-      case 'high':
-        return AppTheme.successColor;
-      case 'medium':
-        return AppTheme.warningColor;
-      case 'low':
-      default:
-        return AppTheme.dangerColor;
-    }
   }
 }

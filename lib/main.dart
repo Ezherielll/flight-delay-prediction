@@ -36,7 +36,6 @@ class FlightDelayPredictApp extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
 
     return MaterialApp.router(
-      key: ValueKey(locale.languageCode),
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)?.appTitle ?? 'Flight Delay Predictor',
       debugShowCheckedModeBanner: false,
