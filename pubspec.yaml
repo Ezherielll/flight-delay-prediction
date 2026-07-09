@@ -42,6 +42,14 @@ dependencies:
   fluttertoast: ^9.1.0
   google_fonts: ^8.1.0
   lottie: ^3.1.2
+  
+  # Serverpod Integration Dependencies
+  serverpod_flutter: 3.4.11
+  serverpod_auth_client: 3.4.11
+  serverpod_auth_email_flutter: 3.4.11
+  serverpod_auth_shared_flutter: 3.4.11
+  flight_server_client:
+    path: ../flight_server_client
 
 dev_dependencies:
   flutter_test:

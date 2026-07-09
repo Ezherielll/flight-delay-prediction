@@ -127,12 +127,15 @@ class PredictionCard extends StatelessWidget {
                             ),
                           ),
                           if (onDelete != null)
-                            GestureDetector(
-                              onTap: onDelete,
-                              child: Icon(
-                                Icons.delete_outline,
-                                size: 18,
-                                color: theme.colorScheme.error.withValues(alpha: 0.8),
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: onDelete,
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  size: 18,
+                                  color: theme.colorScheme.error.withValues(alpha: 0.8),
+                                ),
                               ),
                             ),
                         ],

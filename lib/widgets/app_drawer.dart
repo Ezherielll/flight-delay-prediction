@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import '../core/theme/theme.dart';
+import '../viewmodels/auth_viewmodel.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+    final authState = ref.watch(authProvider);
 
     // Get the current route path to highlight the active menu item
     final String currentRoute = GoRouterState.of(context).uri.path;
@@ -58,9 +61,11 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Flight Intelligence',
-                  style: TextStyle(
+                Text(
+                  authState.user?.userName ?? 'Flight Intelligence',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -68,7 +73,9 @@ class AppDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Kualanamu International (KNO)',
+                  authState.user?.email ?? 'Kualanamu International (KNO)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -127,6 +134,38 @@ class AppDrawer extends StatelessWidget {
                   icon: Icons.settings_rounded,
                   route: '/settings',
                   currentRoute: currentRoute,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Divider(),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4.0),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    leading: const Icon(
+                      Icons.logout_rounded,
+                      color: AppTheme.dangerColor,
+                    ),
+                    title: const Text(
+                      'Log Out',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.dangerColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref.read(authProvider.notifier).signOut();
+                    },
+                  ),
                 ),
               ],
             ),
