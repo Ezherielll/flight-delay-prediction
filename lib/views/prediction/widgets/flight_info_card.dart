@@ -1,9 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../../../widgets/custom_dropdown.dart';
-import '../../../widgets/custom_textfield.dart';
+import 'package:flight_delay_predict/widgets/custom_dropdown.dart';
+import 'package:flight_delay_predict/widgets/custom_textfield.dart';
+import 'package:flutter/material.dart';
 
 class FlightInfoCard extends StatelessWidget {
+
+  const FlightInfoCard({
+    required this.selectedAirline, required this.selectedMovementType, required this.selectedFltType, required this.selectedOrigin, required this.selectedDestination, required this.customAirlineController, required this.onAirlineChanged, required this.onMovementChanged, required this.onFltTypeChanged, required this.onOriginChanged, required this.onDestinationChanged, super.key,
+  });
   final String? selectedAirline;
   final String? selectedMovementType;
   final String? selectedFltType;
@@ -73,21 +77,6 @@ class FlightInfoCard extends StatelessWidget {
     {'label': 'TRK – Juwata, Tarakan', 'value': 'TRK'},
   ];
 
-  const FlightInfoCard({
-    super.key,
-    required this.selectedAirline,
-    required this.selectedMovementType,
-    required this.selectedFltType,
-    required this.selectedOrigin,
-    required this.selectedDestination,
-    required this.customAirlineController,
-    required this.onAirlineChanged,
-    required this.onMovementChanged,
-    required this.onFltTypeChanged,
-    required this.onOriginChanged,
-    required this.onDestinationChanged,
-  });
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -95,7 +84,7 @@ class FlightInfoCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -137,7 +126,6 @@ class FlightInfoCard extends StatelessWidget {
                       controller: customAirlineController,
                       label: 'Custom Airline',
                       hint: 'e.g. SQ, MH',
-                      keyboardType: TextInputType.text,
                       validator: (val) {
                         if (selectedAirline == 'Other' &&
                             (val == null || val.trim().isEmpty)) {

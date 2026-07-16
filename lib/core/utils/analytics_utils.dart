@@ -1,17 +1,17 @@
 import 'package:flight_server_client/flight_server_client.dart';
 
 class AnalyticsSummary {
-  final int totalPredictions;
-  final double delayRate; // 0.0 to 1.0
-  final int uniqueUsers;
-  final int todayPredictions;
-
   AnalyticsSummary({
     required this.totalPredictions,
     required this.delayRate,
     required this.uniqueUsers,
     required this.todayPredictions,
   });
+
+  final int totalPredictions;
+  final double delayRate; // 0.0 to 1.0
+  final int uniqueUsers;
+  final int todayPredictions;
 }
 
 class AnalyticsUtils {
@@ -20,7 +20,7 @@ class AnalyticsUtils {
     if (records.isEmpty) {
       return AnalyticsSummary(
         totalPredictions: 0,
-        delayRate: 0.0,
+        delayRate: 0,
         uniqueUsers: 0,
         todayPredictions: 0,
       );
@@ -49,7 +49,7 @@ class AnalyticsUtils {
   /// Computes total predictions by airline (delayed vs on-time)
   /// Returns Map of Airline -> { 'delayed': count, 'ontime': count }
   static Map<String, Map<String, int>> delayByAirline(List<PredictionRecord> records) {
-    final Map<String, Map<String, int>> result = {};
+    final result = <String, Map<String, int>>{};
 
     for (final r in records) {
       final airline = r.airline.trim().toUpperCase();
@@ -73,11 +73,11 @@ class AnalyticsUtils {
   /// Computes daily trend of predictions for the last 7 days (including today)
   /// Returns Map of DateString (MM/dd) -> { 'delayed': count, 'ontime': count }
   static Map<String, Map<String, int>> dailyTrend(List<PredictionRecord> records) {
-    final Map<String, Map<String, int>> result = {};
+    final result = <String, Map<String, int>>{};
     final now = DateTime.now();
 
     // Initialize map for the last 7 days with zero values
-    for (int i = 6; i >= 0; i--) {
+    for (var i = 6; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
       final dateKey = '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
       result[dateKey] = {'delayed': 0, 'ontime': 0};
@@ -103,7 +103,7 @@ class AnalyticsUtils {
 
   /// Computes distribution of confidence levels: High, Medium, Low
   static Map<String, int> confidenceDistribution(List<PredictionRecord> records) {
-    final Map<String, int> result = {'High': 0, 'Medium': 0, 'Low': 0};
+    final result = {'High': 0, 'Medium': 0, 'Low': 0};
 
     for (final r in records) {
       final confidence = r.confidence.trim();

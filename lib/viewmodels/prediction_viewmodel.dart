@@ -1,19 +1,15 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+
+import 'package:flight_delay_predict/core/services/serverpod_client.dart';
+import 'package:flight_delay_predict/models/history_item.dart';
+import 'package:flight_delay_predict/models/prediction_request.dart';
+import 'package:flight_delay_predict/models/prediction_response.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
 import 'package:flight_server_client/flight_server_client.dart' as sp;
-import '../core/services/serverpod_client.dart';
-import 'settings_viewmodel.dart';
-import '../models/prediction_request.dart';
-import '../models/prediction_response.dart';
-import '../models/history_item.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 1. Prediction State Class
 class PredictionState {
-  final bool isLoading;
-  final String? errorMessage;
-  final PredictionRequest? latestRequest;
-  final PredictionResponse? latestResponse;
-  final List<HistoryItem> history;
-
   PredictionState({
     this.isLoading = false,
     this.errorMessage,
@@ -21,6 +17,12 @@ class PredictionState {
     this.latestResponse,
     this.history = const [],
   });
+
+  final bool isLoading;
+  final String? errorMessage;
+  final PredictionRequest? latestRequest;
+  final PredictionResponse? latestResponse;
+  final List<HistoryItem> history;
 
   PredictionState copyWith({
     bool? isLoading,
@@ -44,7 +46,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
   @override
   PredictionState build() {
     final state = PredictionState();
-    Future.microtask(() => _loadHistory());
+    unawaited(_loadHistory());
     return state;
   }
 
@@ -126,9 +128,9 @@ class PredictionNotifier extends Notifier<PredictionState> {
     try {
       final client = ref.read(serverpodClientProvider);
       final records = await client.predictionHistory.getUserHistory();
-      final historyItems = records.map((record) => _toHistoryItem(record)).toList();
+      final historyItems = records.map(_toHistoryItem).toList();
       state = state.copyWith(history: historyItems);
-    } catch (_) {
+    } on Exception catch (_) {
       // In case of error (e.g. backend offline), initialize empty list
       state = state.copyWith(history: []);
     }
@@ -137,7 +139,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
   // Perform prediction request
   Future<bool> runPrediction(PredictionRequest request) async {
     final apiService = ref.read(apiServiceProvider);
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       // 1. Get prediction from local ML Python FastAPI server
@@ -169,7 +171,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
       );
 
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
@@ -193,7 +195,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
       try {
         final client = ref.read(serverpodClientProvider);
         await client.predictionHistory.deletePrediction(item.id!);
-      } catch (e) {
+      } on Exception catch (_) {
         state = state.copyWith(errorMessage: 'Failed to delete prediction from server');
         return;
       }
@@ -209,7 +211,7 @@ class PredictionNotifier extends Notifier<PredictionState> {
       final client = ref.read(serverpodClientProvider);
       await client.predictionHistory.clearHistory();
       state = state.copyWith(history: []);
-    } catch (e) {
+    } on Exception catch (_) {
       state = state.copyWith(errorMessage: 'Failed to clear history on server');
     }
   }

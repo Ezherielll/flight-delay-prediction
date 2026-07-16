@@ -1,10 +1,4 @@
 class PredictionResponse {
-  final String prediction;
-  final int classValue;
-  final double probability;
-  final String confidence;
-  final double threshold;
-
   PredictionResponse({
     required this.prediction,
     required this.classValue,
@@ -22,6 +16,12 @@ class PredictionResponse {
       threshold: (json['threshold'] as num).toDouble(),
     );
   }
+
+  final String prediction;
+  final int classValue;
+  final double probability;
+  final String confidence;
+  final double threshold;
 
   Map<String, dynamic> toJson() {
     return {

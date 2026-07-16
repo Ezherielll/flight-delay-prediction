@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../../../widgets/custom_textfield.dart';
+import 'package:flight_delay_predict/widgets/custom_textfield.dart';
+import 'package:flutter/material.dart';
 
 class WeatherCard extends StatelessWidget {
+
+  const WeatherCard({
+    required this.tempController, required this.humidityController, required this.rainController, required this.pressureController, required this.cloudCoverController, required this.cloudCoverLowController, required this.cloudCoverMidController, required this.cloudCoverHighController, required this.windSpeed10mController, required this.windSpeed100mController, required this.windDir10mController, required this.windDir100mController, required this.windGustsController, required this.onPresetSelected, super.key,
+  });
   final TextEditingController tempController;
   final TextEditingController humidityController;
   final TextEditingController rainController;
@@ -17,24 +21,6 @@ class WeatherCard extends StatelessWidget {
   final TextEditingController windDir100mController;
   final TextEditingController windGustsController;
   final ValueChanged<String> onPresetSelected;
-
-  const WeatherCard({
-    super.key,
-    required this.tempController,
-    required this.humidityController,
-    required this.rainController,
-    required this.pressureController,
-    required this.cloudCoverController,
-    required this.cloudCoverLowController,
-    required this.cloudCoverMidController,
-    required this.cloudCoverHighController,
-    required this.windSpeed10mController,
-    required this.windSpeed100mController,
-    required this.windDir10mController,
-    required this.windDir100mController,
-    required this.windGustsController,
-    required this.onPresetSelected,
-  });
 
   String? _validateRange(String? value, double min, double max) {
     if (value == null || value.trim().isEmpty) {
@@ -57,7 +43,7 @@ class WeatherCard extends StatelessWidget {
     required Color color,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8),
       child: ActionChip(
         avatar: Icon(icon, color: color, size: 16),
         label: Text(label),
@@ -74,7 +60,7 @@ class WeatherCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

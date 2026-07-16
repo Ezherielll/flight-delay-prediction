@@ -1,9 +1,9 @@
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme/theme.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../core/utils/app_toast.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -40,7 +40,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     super.dispose();
   }
 
-  void _handleLogin() async {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       await ref.read(authProvider.notifier).signIn(
             _emailController.text.trim(),
@@ -69,12 +69,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
       body: VibrantBackground(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: TweenAnimationBuilder<double>(
                 duration: const Duration(milliseconds: 600),
-                tween: Tween(begin: 0.0, end: 1.0),
+                tween: Tween(begin: 0, end: 1),
                 curve: Curves.easeOutBack,
                 builder: (context, value, child) {
                   return Transform.scale(
@@ -86,7 +86,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   );
                 },
                 child: GlassCard(
-                  padding: const EdgeInsets.symmetric(vertical: 48.0, horizontal: 28.0),
+                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 28),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -196,7 +196,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: AppTheme.dangerColor.withValues(alpha: 0.25),
-                                width: 1,
                               ),
                             ),
                             child: Row(

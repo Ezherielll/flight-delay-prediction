@@ -1,11 +1,13 @@
+import 'dart:async';
+
+import 'package:flight_delay_predict/core/services/export_service.dart';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/viewmodels/admin_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
+import 'package:flight_delay_predict/views/admin/widgets/analytics_tab.dart';
+import 'package:flight_delay_predict/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../viewmodels/admin_viewmodel.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../core/theme/theme.dart';
-import '../../widgets/app_drawer.dart';
-import '../../core/services/export_service.dart';
-import 'widgets/analytics_tab.dart';
 
 class AdminPanelView extends ConsumerStatefulWidget {
   const AdminPanelView({super.key});
@@ -28,8 +30,8 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
 
     // Fetch data when the view is first loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(adminProvider.notifier).fetchAllUsers();
-      ref.read(adminProvider.notifier).fetchAllPredictions();
+      unawaited(ref.read(adminProvider.notifier).fetchAllUsers());
+      unawaited(ref.read(adminProvider.notifier).fetchAllPredictions());
     });
   }
 
@@ -69,14 +71,16 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
               icon: const Icon(Icons.download),
               tooltip: 'Export All Predictions to CSV',
               onPressed: () {
-                ExportService.exportRecordsToCsv(adminState.allPredictions);
+                unawaited(
+                  ExportService.exportRecordsToCsv(adminState.allPredictions),
+                );
               },
             ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.read(adminProvider.notifier).fetchAllUsers();
-              ref.read(adminProvider.notifier).fetchAllPredictions();
+              unawaited(ref.read(adminProvider.notifier).fetchAllUsers());
+              unawaited(ref.read(adminProvider.notifier).fetchAllPredictions());
             },
           ),
         ],
@@ -258,10 +262,8 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
                               userRole.userInfoId,
                               userRole.role,
                             );
-                            break;
                           case 'delete':
                             _showDeleteDialog(context, userRole.userInfoId);
-                            break;
                         }
                       },
                       itemBuilder: (context) => [
@@ -307,58 +309,66 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
     final newRole = currentRole == 'admin' ? 'amc' : 'admin';
     final newRoleLabel = newRole == 'admin' ? 'Administrator' : 'Petugas AMC';
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Change Role'),
-        content: Text(
-          'Change User #$userId\'s role to $newRoleLabel?',
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Change Role'),
+          content: Text(
+            "Change User #$userId's role to $newRoleLabel?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                unawaited(
+                  ref.read(adminProvider.notifier).updateRole(userId, newRole),
+                );
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref.read(adminProvider.notifier).updateRole(userId, newRole);
-            },
-            child: const Text('Confirm'),
-          ),
-        ],
       ),
     );
   }
 
   void _showDeleteDialog(BuildContext context, int userId) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete User'),
-        content: Text(
-          'Are you sure you want to delete User #$userId? '
-          'This will remove their role, profile, and all prediction records. '
-          'This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Delete User'),
+          content: Text(
+            'Are you sure you want to delete User #$userId? '
+            'This will remove their role, profile, and all prediction records. '
+            'This action cannot be undone.',
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref.read(adminProvider.notifier).deleteUser(userId);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.dangerColor,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
             ),
-            child: const Text('Delete'),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                unawaited(ref.read(adminProvider.notifier).deleteUser(userId));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.dangerColor,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
       ),
     );
   }

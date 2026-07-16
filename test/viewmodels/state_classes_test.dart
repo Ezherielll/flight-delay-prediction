@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
-import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
+import 'package:flight_delay_predict/models/history_item.dart';
 import 'package:flight_delay_predict/models/prediction_request.dart';
 import 'package:flight_delay_predict/models/prediction_response.dart';
-import 'package:flight_delay_predict/models/history_item.dart';
+import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   // =================================================================
@@ -58,7 +58,7 @@ void main() {
         expect(connected.isConnected, isTrue);
 
         // Then reset to null — this is intentional behavior per the code comment
-        final reset = connected.copyWith(isConnected: null);
+        final reset = connected.copyWith();
         expect(reset.isConnected, isNull);
       });
 
@@ -68,7 +68,7 @@ void main() {
         );
         expect(withError.connectionErrorMessage, 'Timeout');
 
-        final cleared = withError.copyWith(connectionErrorMessage: null);
+        final cleared = withError.copyWith();
         expect(cleared.connectionErrorMessage, isNull);
       });
 
@@ -103,19 +103,19 @@ void main() {
           fltType: 'schedule',
           date: '2025-01-01',
           hour: 10,
-          temperature2m: 28.0,
-          relativeHumidity2m: 70.0,
-          rain: 0.0,
-          surfacePressure: 1010.0,
-          cloudCover: 40.0,
-          cloudCoverLow: 10.0,
-          cloudCoverMid: 20.0,
-          cloudCoverHigh: 30.0,
-          windSpeed10m: 10.0,
-          windSpeed100m: 15.0,
-          windDirection10m: 180.0,
-          windDirection100m: 180.0,
-          windGusts10m: 12.0,
+          temperature2m: 28,
+          relativeHumidity2m: 70,
+          rain: 0,
+          surfacePressure: 1010,
+          cloudCover: 40,
+          cloudCoverLow: 10,
+          cloudCoverMid: 20,
+          cloudCoverHigh: 30,
+          windSpeed10m: 10,
+          windSpeed100m: 15,
+          windDirection10m: 180,
+          windDirection100m: 180,
+          windGusts10m: 12,
         );
 
     PredictionResponse sampleResponse() => PredictionResponse(
@@ -166,7 +166,7 @@ void main() {
         expect(withError.errorMessage, 'Network error');
 
         // errorMessage intentionally allows explicit null reset
-        final cleared = withError.copyWith(errorMessage: null);
+        final cleared = withError.copyWith();
         expect(cleared.errorMessage, isNull);
       });
 

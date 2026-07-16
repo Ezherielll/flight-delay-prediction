@@ -1,16 +1,17 @@
 import 'dart:convert';
+
 import 'package:csv/csv.dart';
+import 'package:flight_delay_predict/core/utils/csv_downloader.dart';
+import 'package:flight_delay_predict/models/history_item.dart';
+import 'package:flight_server_client/flight_server_client.dart' as sp;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import '../../models/history_item.dart';
-import 'package:flight_server_client/flight_server_client.dart' as sp;
-import '../utils/csv_downloader.dart';
 
 class ExportService {
   /// Exports Petugas AMC prediction history to CSV
   static Future<void> exportHistoryToCsv(List<HistoryItem> items) async {
-    final List<List<dynamic>> rows = [
+    final rows = <List<dynamic>>[
       [
         'Timestamp',
         'Airline',
@@ -66,7 +67,7 @@ class ExportService {
 
   /// Exports Admin bulk prediction records to CSV
   static Future<void> exportRecordsToCsv(List<sp.PredictionRecord> records) async {
-    final List<List<dynamic>> rows = [
+    final rows = <List<dynamic>>[
       [
         'Timestamp',
         'User ID',
@@ -117,7 +118,7 @@ class ExportService {
     final pdf = pw.Document();
 
     // Chunk size: 12 items per page to prevent A4 Landscape overflow
-    final List<List<HistoryItem>> chunks = [];
+    final chunks = <List<HistoryItem>>[];
     for (var i = 0; i < items.length; i += 12) {
       chunks.add(items.sublist(i, i + 12 > items.length ? items.length : i + 12));
     }
@@ -127,7 +128,7 @@ class ExportService {
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4.landscape,
-          build: (pw.Context context) {
+          build: (context) {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [

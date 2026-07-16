@@ -1,10 +1,7 @@
 import 'package:dio/dio.dart';
-import 'storage_service.dart';
+import 'package:flight_delay_predict/core/services/storage_service.dart';
 
 class ApiService {
-  final StorageService _storageService;
-  final Dio _dio;
-
   ApiService(this._storageService)
       : _dio = Dio(
           BaseOptions(
@@ -17,19 +14,23 @@ class ApiService {
           ),
         );
 
+  final StorageService _storageService;
+  final Dio _dio;
+
   // Get base URL dynamically from storage
   String get _baseUrl => _storageService.getBaseUrl();
 
   // Test Connection
   Future<bool> checkHealth() async {
     try {
-      final response = await _dio.get('$_baseUrl/api/health');
+      final response =
+          await _dio.get<Map<String, dynamic>>('$_baseUrl/api/health');
       if (response.statusCode == 200) {
         final data = response.data;
-        return data['status'] == 'healthy' || data['status'] == 'success';
+        return data?['status'] == 'healthy' || data?['status'] == 'success';
       }
       return false;
-    } catch (e) {
+    } on Exception catch (_) {
       return false;
     }
   }
@@ -37,25 +38,25 @@ class ApiService {
   // Prediction request
   Future<Map<String, dynamic>> predict(Map<String, dynamic> requestData) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<Map<String, dynamic>>(
         '$_baseUrl/api/predict',
         data: requestData,
       );
       
       if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
+        return response.data!;
       } else {
         throw _handleResponseError(response);
       }
     } on DioException catch (e) {
       throw _handleDioError(e);
-    } catch (e) {
+    } on Exception catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
   }
 
   // Handle non-200 responses
-  Exception _handleResponseError(Response response) {
+  Exception _handleResponseError(Response<dynamic> response) {
     final data = response.data;
     if (data is Map) {
       if (data.containsKey('error')) {
@@ -89,7 +90,9 @@ class ApiService {
     }
     
     if (e.type == DioExceptionType.connectionError) {
-      return Exception('Unable to connect to server. Please check your network and API host address.');
+      return Exception(
+        'Unable to connect to server. Please check your network and API host address.',
+      );
     }
 
     final response = e.response;
@@ -102,11 +105,13 @@ class ApiService {
       }
       try {
         return _handleResponseError(response);
-      } catch (_) {
+      } on Exception catch (_) {
         return Exception('Server Error: ${response.statusCode}');
       }
     }
 
-    return Exception('Network connection error: ${e.message ?? 'Unknown issue'}');
+    return Exception(
+      'Network connection error: ${e.message ?? 'Unknown issue'}',
+    );
   }
 }

@@ -1,15 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flight_delay_predict/core/services/serverpod_client.dart';
 import 'package:flight_server_client/flight_server_client.dart';
-import '../core/services/serverpod_client.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// State for the Admin Panel
 class AdminState {
-  final List<UserRole> users;
-  final List<PredictionRecord> allPredictions;
-  final bool isLoadingUsers;
-  final bool isLoadingPredictions;
-  final String? errorMessage;
-
   AdminState({
     this.users = const [],
     this.allPredictions = const [],
@@ -17,6 +11,12 @@ class AdminState {
     this.isLoadingPredictions = false,
     this.errorMessage,
   });
+
+  final List<UserRole> users;
+  final List<PredictionRecord> allPredictions;
+  final bool isLoadingUsers;
+  final bool isLoadingPredictions;
+  final String? errorMessage;
 
   AdminState copyWith({
     List<UserRole>? users,
@@ -46,11 +46,11 @@ class AdminViewModel extends Notifier<AdminState> {
 
   /// Fetch all users with their roles.
   Future<void> fetchAllUsers() async {
-    state = state.copyWith(isLoadingUsers: true, errorMessage: null);
+    state = state.copyWith(isLoadingUsers: true);
     try {
       final users = await _client.userRole.getAllUsers();
       state = state.copyWith(users: users, isLoadingUsers: false);
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoadingUsers: false,
         errorMessage: 'Failed to fetch users: ${e.toString().replaceAll("Exception: ", "")}',
@@ -60,14 +60,14 @@ class AdminViewModel extends Notifier<AdminState> {
 
   /// Fetch all prediction records from all users.
   Future<void> fetchAllPredictions() async {
-    state = state.copyWith(isLoadingPredictions: true, errorMessage: null);
+    state = state.copyWith(isLoadingPredictions: true);
     try {
       final predictions = await _client.predictionHistory.getAllPredictions();
       state = state.copyWith(
         allPredictions: predictions,
         isLoadingPredictions: false,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoadingPredictions: false,
         errorMessage: 'Failed to fetch predictions: ${e.toString().replaceAll("Exception: ", "")}',
@@ -81,7 +81,7 @@ class AdminViewModel extends Notifier<AdminState> {
       await _client.userRole.updateUserRole(targetUserId, newRole);
       await fetchAllUsers(); // Refresh the list
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
@@ -95,7 +95,7 @@ class AdminViewModel extends Notifier<AdminState> {
       await _client.userRole.deleteUser(targetUserId);
       await fetchAllUsers(); // Refresh the list
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
@@ -105,7 +105,7 @@ class AdminViewModel extends Notifier<AdminState> {
 
   /// Clear the error message.
   void clearError() {
-    state = state.copyWith(errorMessage: null);
+    state = state.copyWith();
   }
 }
 

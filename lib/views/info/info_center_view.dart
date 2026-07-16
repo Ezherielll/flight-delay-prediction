@@ -1,10 +1,10 @@
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/models/info_center_data.dart';
+import 'package:flight_delay_predict/viewmodels/info_center_viewmodel.dart';
+import 'package:flight_delay_predict/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/theme.dart';
-import '../../models/info_center_data.dart';
-import '../../viewmodels/info_center_viewmodel.dart';
-import '../../widgets/app_drawer.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class InfoCenterView extends ConsumerStatefulWidget {
   const InfoCenterView({super.key});
@@ -44,7 +44,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => notifier.loadData(),
+            onPressed: notifier.loadData,
           )
         ],
       ),
@@ -66,7 +66,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
           if (state.errorMessage != null) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -79,7 +79,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => notifier.loadData(),
+                      onPressed: notifier.loadData,
                       child: Text(l10n?.retryLoading ?? 'Retry Loading'),
                     )
                   ],
@@ -138,9 +138,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                               )
                             : null,
                       ),
-                      onChanged: (val) {
-                        notifier.updateSearchQuery(val);
-                      },
+                      onChanged: notifier.updateSearchQuery,
                     ),
                   ],
                 ),
@@ -229,7 +227,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
     if (totalResults == 0) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -322,7 +320,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
 
   Widget _buildSearchCategoryHeader(ThemeData theme, String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: Row(
         children: [
           Icon(icon, size: 16, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
@@ -333,7 +331,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.primary,
-              letterSpacing: 1.0,
+              letterSpacing: 1,
             ),
           ),
         ],
@@ -351,7 +349,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         // About System Card
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -392,7 +390,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                       const Text('Data Sources Combined:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       const SizedBox(height: 6),
                       ...data.about.dataSources.map((ds) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            padding: const EdgeInsets.symmetric(vertical: 2),
                             child: Row(
                               children: [
                                 Icon(Icons.check_circle_outline, color: theme.colorScheme.primary, size: 14),
@@ -422,7 +420,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         // Delay Classification
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -471,7 +469,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         // Prediction Output & Confidence Guide
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -515,7 +513,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         // Machine Learning Overview
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -533,7 +531,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                         Text(model.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 8),
                         ...model.advantages.map((adv) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -555,7 +553,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         // Feature Importance
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -570,7 +568,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                 Text(data.featureImportance.intro, style: const TextStyle(fontSize: 14, height: 1.4)),
                 const SizedBox(height: 16),
                 ...data.featureImportance.topFeatures.map((tf) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -662,7 +660,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
                   side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.12)),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -695,7 +693,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
       children: List.generate(steps.length * 2 - 1, (i) {
         if (i.isOdd) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Icon(Icons.arrow_downward, color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 20),
           );
         }
@@ -710,7 +708,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
             side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.12)),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 CircleAvatar(
@@ -777,9 +775,9 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
   Widget _buildWeatherCard(BuildContext context, WeatherParam w) {
     final theme = Theme.of(context);
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1077,7 +1075,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         ),
         const SizedBox(height: 8),
         ...data.faq.map((f) => Card(
-              margin: const EdgeInsets.symmetric(vertical: 4.0),
+              margin: const EdgeInsets.symmetric(vertical: 4),
               child: ExpansionTile(
                 title: Text(
                   f.question,
@@ -1107,7 +1105,7 @@ class _InfoCenterViewState extends ConsumerState<InfoCenterView> with SingleTick
         ),
         const SizedBox(height: 8),
         ...data.glossary.map((g) => Card(
-              margin: const EdgeInsets.symmetric(vertical: 4.0),
+              margin: const EdgeInsets.symmetric(vertical: 4),
               child: ExpansionTile(
                 title: Text(
                   g.term,

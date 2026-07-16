@@ -1,7 +1,8 @@
 import 'dart:js_interop';
 import 'dart:typed_data';
+
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
 import 'package:web/web.dart' as web;
-import 'app_toast.dart';
 
 /// Web-specific CSV download using the browser's native download mechanism.
 /// Works for both Flutter Web (JS) and Flutter Web (WASM) builds.
@@ -14,16 +15,16 @@ Future<void> downloadCsvFile(List<int> bytes, String filename) async {
     );
     final url = web.URL.createObjectURL(blob);
 
-    final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
-    anchor.href = url;
-    anchor.setAttribute('download', filename);
-    web.document.body!.appendChild(anchor);
-    anchor.click();
-    web.document.body!.removeChild(anchor);
+    final anchor = web.document.createElement('a') as web.HTMLAnchorElement
+      ..href = url
+      ..setAttribute('download', filename);
+    web.document.body!
+      ..appendChild(anchor)
+      ..removeChild(anchor..click());
     web.URL.revokeObjectURL(url);
 
     AppToast.show('✅ File berhasil diunduh: $filename');
-  } catch (e) {
+  } on Exception catch (e) {
     AppToast.show('Gagal mengunduh file: $e', isError: true);
   }
 }

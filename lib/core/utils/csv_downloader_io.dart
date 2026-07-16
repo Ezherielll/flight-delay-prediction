@@ -1,6 +1,7 @@
 import 'dart:io';
+
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
 import 'package:path_provider/path_provider.dart';
-import 'app_toast.dart';
 
 /// Mobile & Desktop CSV download using path_provider and dart:io.
 Future<void> downloadCsvFile(List<int> bytes, String filename) async {
@@ -19,7 +20,7 @@ Future<void> downloadCsvFile(List<int> bytes, String filename) async {
     await file.writeAsBytes(bytes);
 
     AppToast.show('✅ File tersimpan:\n${file.path}');
-  } catch (e) {
+  } on Exception catch (e) {
     AppToast.show('Gagal menyimpan file: $e', isError: true);
   }
 }

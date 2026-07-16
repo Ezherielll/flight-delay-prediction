@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/analytics_utils.dart';
 import 'package:flight_server_client/flight_server_client.dart';
-import '../../../core/utils/analytics_utils.dart';
-import '../../../core/theme/theme.dart';
+import 'package:flutter/material.dart';
 
 class AnalyticsTab extends StatelessWidget {
-  final List<PredictionRecord> predictions;
+  const AnalyticsTab({required this.predictions, super.key});
 
-  const AnalyticsTab({super.key, required this.predictions});
+  final List<PredictionRecord> predictions;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class AnalyticsTab extends StatelessWidget {
     if (predictions.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -64,7 +64,7 @@ class AnalyticsTab extends StatelessWidget {
     final confidenceData = AnalyticsUtils.confidenceDistribution(predictions);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -233,7 +233,6 @@ class AnalyticsTab extends StatelessWidget {
 
   Widget _buildSectionHeader(BuildContext context, IconData icon, Color color, String title, String subtitle) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           padding: const EdgeInsets.all(9),
@@ -369,11 +368,11 @@ class AnalyticsTab extends StatelessWidget {
     final theme = Theme.of(context);
     final keys = data.keys.toList();
 
-    final List<FlSpot> delayedSpots = [];
-    final List<FlSpot> ontimeSpots = [];
-    double maxY = 4.0;
+    final delayedSpots = <FlSpot>[];
+    final ontimeSpots = <FlSpot>[];
+    var maxY = 4.0;
 
-    for (int i = 0; i < keys.length; i++) {
+    for (var i = 0; i < keys.length; i++) {
       final key = keys[i];
       final delayed = data[key]!['delayed']!.toDouble();
       final ontime = data[key]!['ontime']!.toDouble();
@@ -402,7 +401,6 @@ class AnalyticsTab extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 lineTouchData: LineTouchData(
-                  enabled: true,
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (_) => theme.colorScheme.inverseSurface,
                     tooltipRoundedRadius: 10,
@@ -422,7 +420,6 @@ class AnalyticsTab extends StatelessWidget {
                   ),
                 ),
                 gridData: FlGridData(
-                  show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
@@ -430,8 +427,8 @@ class AnalyticsTab extends StatelessWidget {
                   ),
                 ),
                 titlesData: FlTitlesData(
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(),
+                  topTitles: const AxisTitles(),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -440,7 +437,7 @@ class AnalyticsTab extends StatelessWidget {
                         final idx = value.toInt();
                         if (idx >= 0 && idx < keys.length) {
                           return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               keys[idx],
                               style: TextStyle(
@@ -496,7 +493,6 @@ class AnalyticsTab extends StatelessWidget {
       barWidth: 3,
       isStrokeCapRound: true,
       dotData: FlDotData(
-        show: true,
         getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
           radius: 4,
           color: bar.color ?? color,
@@ -507,7 +503,7 @@ class AnalyticsTab extends StatelessWidget {
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.0)],
+          colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -529,9 +525,9 @@ class AnalyticsTab extends StatelessWidget {
 
     final displayAirlines = sortedAirlines.take(5).toList();
 
-    double maxY = 4.0;
-    final List<BarChartGroupData> barGroups = [];
-    for (int i = 0; i < displayAirlines.length; i++) {
+    var maxY = 4.0;
+    final barGroups = <BarChartGroupData>[];
+    for (var i = 0; i < displayAirlines.length; i++) {
       final airline = displayAirlines[i];
       final delayed = data[airline]!['delayed']!.toDouble();
       final ontime = data[airline]!['ontime']!.toDouble();
@@ -605,7 +601,6 @@ class AnalyticsTab extends StatelessWidget {
                         ),
                       ),
                       gridData: FlGridData(
-                        show: true,
                         drawVerticalLine: false,
                         getDrawingHorizontalLine: (value) => FlLine(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
@@ -616,8 +611,8 @@ class AnalyticsTab extends StatelessWidget {
                       maxY: maxY,
                       groupsSpace: 20,
                       titlesData: FlTitlesData(
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(),
+                        topTitles: const AxisTitles(),
                         leftTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
@@ -640,7 +635,7 @@ class AnalyticsTab extends StatelessWidget {
                               final idx = value.toInt();
                               if (idx >= 0 && idx < displayAirlines.length) {
                                 return Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8),
                                   child: Text(
                                     displayAirlines[idx],
                                     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
@@ -676,7 +671,6 @@ class AnalyticsTab extends StatelessWidget {
     return _buildChartCard(
       context,
       Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Donut chart with center label
           Expanded(

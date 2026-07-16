@@ -1,18 +1,14 @@
+import 'dart:async';
+
+import 'package:flight_delay_predict/core/services/auth_service.dart';
+import 'package:flight_delay_predict/core/services/serverpod_client.dart';
+import 'package:flight_delay_predict/models/user_role.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flight_server_client/flight_server_client.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_client/serverpod_auth_client.dart';
-import 'package:flight_server_client/flight_server_client.dart';
-import '../core/services/auth_service.dart';
-import '../core/services/serverpod_client.dart';
-import '../models/user_role.dart';
-import 'settings_viewmodel.dart';
 
 class AuthState {
-  final bool isAuthenticated;
-  final UserInfo? user;
-  final bool isLoading;
-  final String? errorMessage;
-  final UserRoleType role;
-
   AuthState({
     required this.isAuthenticated,
     this.user,
@@ -20,6 +16,12 @@ class AuthState {
     this.errorMessage,
     this.role = UserRoleType.amc,
   });
+
+  final bool isAuthenticated;
+  final UserInfo? user;
+  final bool isLoading;
+  final String? errorMessage;
+  final UserRoleType role;
 
   bool get isAdmin => role == UserRoleType.admin;
 
@@ -57,7 +59,7 @@ class AuthViewModel extends Notifier<AuthState> {
 
     // If already signed in, fetch role
     if (_authService.isSignedIn) {
-      _fetchRole();
+      unawaited(_fetchRole());
     }
 
     return AuthState(
@@ -73,7 +75,7 @@ class AuthViewModel extends Notifier<AuthState> {
       user: _authService.sessionManager.signedInUser,
     );
     if (isSignedIn) {
-      _fetchRole();
+      unawaited(_fetchRole());
     }
   }
 
@@ -84,14 +86,14 @@ class AuthViewModel extends Notifier<AuthState> {
       state = state.copyWith(
         role: UserRoleType.fromString(userRole.role),
       );
-    } catch (e) {
+    } on Exception catch (_) {
       // If fetching role fails, default to amc
       state = state.copyWith(role: UserRoleType.amc);
     }
   }
 
   Future<void> signIn(String email, String password) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final user = await _authService.signIn(email, password);
       if (user != null) {
@@ -108,7 +110,7 @@ class AuthViewModel extends Notifier<AuthState> {
           errorMessage: 'Invalid email or password',
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
@@ -117,12 +119,12 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<bool> registerRequest(String username, String email, String password) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final success = await _authService.createAccountRequest(username, email, password);
       state = state.copyWith(isLoading: false);
       return success;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
@@ -132,7 +134,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> confirmRegistration(String email, String code) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final user = await _authService.confirmRegistration(email, code);
       if (user != null) {
@@ -147,7 +149,7 @@ class AuthViewModel extends Notifier<AuthState> {
           errorMessage: 'Invalid verification code',
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
@@ -156,7 +158,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> signOut() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final success = await _authService.signOut();
       if (!success) {
@@ -170,10 +172,10 @@ class AuthViewModel extends Notifier<AuthState> {
         // Try to refresh session to clear in-memory _signedInUser
         try {
           await _authService.sessionManager.refreshSession();
-        } catch (_) {}
+        } on Exception catch (_) {}
       }
       state = AuthState(isAuthenticated: false);
-    } catch (e) {
+    } on Exception catch (_) {
       // Force local sign out on any exception
       try {
         await _authService.sessionManager.keyManager.remove();
@@ -182,13 +184,13 @@ class AuthViewModel extends Notifier<AuthState> {
         await prefs.remove('serverpod_userinfo_key_$runMode');
         await prefs.remove('serverpod_userinfo_key_${runMode}_version');
         await _authService.sessionManager.refreshSession();
-      } catch (_) {}
+      } on Exception catch (_) {}
       state = AuthState(isAuthenticated: false);
     }
   }
 
   void clearError() {
-    state = state.copyWith(errorMessage: null);
+    state = state.copyWith();
   }
 }
 

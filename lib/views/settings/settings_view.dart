@@ -1,12 +1,13 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/locale_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flight_delay_predict/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/utils/app_toast.dart';
-import '../../viewmodels/settings_viewmodel.dart';
-import '../../core/theme/theme.dart';
-import '../../widgets/custom_textfield.dart';
-import '../../viewmodels/locale_viewmodel.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -83,7 +84,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -96,7 +97,6 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   color: theme.colorScheme.onSurface.withValues(
                     alpha: isDark ? 0.08 : 0.05,
                   ),
-                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -107,7 +107,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -172,7 +172,6 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                             color: state.isConnected!
                                 ? AppTheme.successColor.withValues(alpha: 0.25)
                                 : AppTheme.dangerColor.withValues(alpha: 0.25),
-                            width: 1,
                           ),
                         ),
                         child: Row(
@@ -268,7 +267,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                             ),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
+                                vertical: 16,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -338,7 +337,6 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   color: theme.colorScheme.onSurface.withValues(
                     alpha: isDark ? 0.08 : 0.05,
                   ),
-                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -394,7 +392,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   value: state.isDarkMode,
                   activeThumbColor: theme.colorScheme.primary,
                   onChanged: (val) {
-                    notifier.toggleTheme(val);
+                    unawaited(notifier.toggleTheme(enabled: val));
                   },
                 ),
               ),
@@ -410,7 +408,6 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   color: theme.colorScheme.onSurface.withValues(
                     alpha: isDark ? 0.08 : 0.05,
                   ),
-                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -421,7 +418,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -509,7 +506,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
     return InkWell(
       onTap: () {
-        ref.read(localeProvider.notifier).setLocale(Locale(languageCode));
+        unawaited(ref.read(localeProvider.notifier).setLocale(Locale(languageCode)));
       },
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(

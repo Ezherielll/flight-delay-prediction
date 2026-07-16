@@ -1,7 +1,7 @@
+import 'package:flight_delay_predict/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flight_delay_predict/core/theme/theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -136,7 +136,7 @@ void main() {
       });
 
       test('card shape has correct border radius', () {
-        final shape = AppTheme.lightTheme.cardTheme.shape as RoundedRectangleBorder;
+        final shape = AppTheme.lightTheme.cardTheme.shape! as RoundedRectangleBorder;
         final radius = shape.borderRadius as BorderRadius;
         expect(radius.topLeft.x, AppTheme.cardRadius);
       });

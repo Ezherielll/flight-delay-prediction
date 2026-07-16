@@ -14,7 +14,7 @@ class AppTheme {
       // kIsWeb is exported by package:flutter/foundation.dart, but is also available via material.dart
       if (kIsWeb) return false;
       return Platform.environment.containsKey('FLUTTER_TEST');
-    } catch (_) {
+    } on Exception catch (_) {
       return false;
     }
   }
@@ -29,7 +29,7 @@ class AppTheme {
   static const Color infoColor = Color(0xFF06B6D4); // Cyan
 
   // Card & Border Radius
-  static const double cardRadius = 16.0;
+  static const double cardRadius = 16;
 
   // Utility to determine confidence color
   static Color getConfidenceColor(String confidence) {
@@ -50,7 +50,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
-        brightness: Brightness.light,
+
         primary: primaryColor,
         secondary: secondaryColor,
         error: dangerColor,
@@ -77,7 +77,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(cardRadius),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -100,7 +100,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(cardRadius),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
@@ -142,8 +142,8 @@ class AppTheme {
           borderSide: const BorderSide(color: dangerColor, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 16.0,
+          horizontal: 16,
+          vertical: 16,
         ),
         hintStyle: const TextStyle(color: Color(0xFF94A3B8)), // Slate-400
       ),
@@ -183,7 +183,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(cardRadius),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -206,7 +206,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(cardRadius),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
@@ -248,8 +248,8 @@ class AppTheme {
           borderSide: const BorderSide(color: dangerColor, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 16.0,
+          horizontal: 16,
+          vertical: 16,
         ),
         hintStyle: const TextStyle(color: Color(0xFF64748B)), // Slate-500
       ),
@@ -262,8 +262,9 @@ class AppTheme {
 // =================================================================
 
 class VibrantBackground extends StatelessWidget {
+  const VibrantBackground({required this.child, super.key});
+
   final Widget child;
-  const VibrantBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -320,20 +321,19 @@ class VibrantBackground extends StatelessWidget {
 }
 
 class GlassCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  
   const GlassCard({
-    super.key, 
-    required this.child,
+    required this.child, super.key,
     this.padding,
   });
+
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: padding ?? const EdgeInsets.all(28.0),
+      padding: padding ?? const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: isDark
             ? const Color(0xFF1E293B).withValues(alpha: 0.65)

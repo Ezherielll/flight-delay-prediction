@@ -1,16 +1,14 @@
+import 'package:flight_delay_predict/core/services/router.dart';
+import 'package:flight_delay_predict/core/services/serverpod_client.dart';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/locale_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flight_server_client/flight_server_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
-import 'package:flight_server_client/flight_server_client.dart';
-
-import 'core/theme/theme.dart';
-import 'core/services/router.dart';
-import 'core/services/serverpod_client.dart';
-import 'viewmodels/settings_viewmodel.dart';
-
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import 'viewmodels/locale_viewmodel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   // Ensure Flutter engine services are bound
@@ -22,6 +20,7 @@ void main() async {
   // Initialize Serverpod Client & SessionManager
   final client = Client(
     'http://localhost:8080/',
+    // FlutterAuthenticationKeyManager is deprecated but still required by Serverpod
     // ignore: deprecated_member_use
     authenticationKeyManager: FlutterAuthenticationKeyManager(),
   );

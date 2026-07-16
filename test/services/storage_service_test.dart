@@ -1,6 +1,6 @@
+import 'package:flight_delay_predict/core/services/storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flight_delay_predict/core/services/storage_service.dart';
 
 void main() {
   group('StorageService', () {
@@ -62,13 +62,13 @@ void main() {
       });
 
       test('saves and retrieves dark mode enabled', () async {
-        await storageService.setDarkMode(true);
+        await storageService.setDarkMode(enabled: true);
         expect(storageService.isDarkMode(), isTrue);
       });
 
       test('can toggle back to false', () async {
-        await storageService.setDarkMode(true);
-        await storageService.setDarkMode(false);
+        await storageService.setDarkMode(enabled: true);
+        await storageService.setDarkMode(enabled: false);
         expect(storageService.isDarkMode(), isFalse);
       });
     });
@@ -93,7 +93,7 @@ void main() {
 
       test('limits history to 50 items', () async {
         // Add 55 items
-        for (int i = 0; i < 55; i++) {
+        for (var i = 0; i < 55; i++) {
           await storageService.addHistoryItem('{"index": $i}');
         }
 

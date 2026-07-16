@@ -1,22 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../../../widgets/custom_dropdown.dart';
+import 'package:flight_delay_predict/widgets/custom_dropdown.dart';
+import 'package:flutter/material.dart';
 
 class DateTimeCard extends StatelessWidget {
+
+  const DateTimeCard({
+    required this.selectedDate, required this.selectedHour, required this.onDateChanged, required this.onHourChanged, super.key,
+  });
   final DateTime? selectedDate;
   final int? selectedHour;
   final ValueChanged<DateTime?> onDateChanged;
   final ValueChanged<int?> onHourChanged;
 
   static final List<int> _hours = List.generate(24, (i) => i);
-
-  const DateTimeCard({
-    super.key,
-    required this.selectedDate,
-    required this.selectedHour,
-    required this.onDateChanged,
-    required this.onHourChanged,
-  });
 
   String _getDayLabel(DateTime date) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -30,7 +26,7 @@ class DateTimeCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

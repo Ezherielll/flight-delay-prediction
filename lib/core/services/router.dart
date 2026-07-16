@@ -1,28 +1,27 @@
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
+import 'package:flight_delay_predict/views/admin/admin_panel_view.dart';
+import 'package:flight_delay_predict/views/auth/login_view.dart';
+import 'package:flight_delay_predict/views/auth/register_view.dart';
+import 'package:flight_delay_predict/views/history/history_view.dart';
+import 'package:flight_delay_predict/views/home/home_view.dart';
+import 'package:flight_delay_predict/views/info/info_center_view.dart';
+import 'package:flight_delay_predict/views/prediction/prediction_view.dart';
+import 'package:flight_delay_predict/views/result/result_view.dart';
+import 'package:flight_delay_predict/views/settings/settings_view.dart';
+import 'package:flight_delay_predict/views/splash/splash_view.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../views/splash/splash_view.dart';
-import '../../views/home/home_view.dart';
-import '../../views/prediction/prediction_view.dart';
-import '../../views/result/result_view.dart';
-import '../../views/history/history_view.dart';
-import '../../views/settings/settings_view.dart';
-import '../../views/info/info_center_view.dart';
-import '../../views/auth/login_view.dart';
-import '../../views/auth/register_view.dart';
-import '../../views/admin/admin_panel_view.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../utils/app_toast.dart';
+import 'package:go_router/go_router.dart';
 
 class GoRouterRefreshNotifier extends ChangeNotifier {
-  final Ref ref;
-
   GoRouterRefreshNotifier(this.ref) {
     ref.listen(authProvider, (previous, next) {
       notifyListeners();
     });
   }
+
+  final Ref ref;
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -30,7 +29,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: AppToast.navigatorKey,
     initialLocation: '/',
     refreshListenable: GoRouterRefreshNotifier(ref),
-    redirect: (BuildContext context, GoRouterState state) {
+    redirect: (context, state) {
       final authState = ref.read(authProvider);
 
       final loggingIn =
@@ -58,61 +57,61 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const SplashView();
         },
       ),
       GoRoute(
         path: '/login',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const LoginView();
         },
       ),
       GoRoute(
         path: '/register',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const RegisterView();
         },
       ),
       GoRoute(
         path: '/home',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const HomeView();
         },
       ),
       GoRoute(
         path: '/predict',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const PredictionView();
         },
       ),
       GoRoute(
         path: '/result',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const ResultView();
         },
       ),
       GoRoute(
         path: '/history',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const HistoryView();
         },
       ),
       GoRoute(
         path: '/settings',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const SettingsView();
         },
       ),
       GoRoute(
         path: '/info',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const InfoCenterView();
         },
       ),
       GoRoute(
         path: '/admin',
-        builder: (BuildContext context, GoRouterState state) {
+        builder: (context, state) {
           return const AdminPanelView();
         },
       ),

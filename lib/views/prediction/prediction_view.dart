@@ -1,17 +1,19 @@
+import 'dart:async';
+
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/models/prediction_request.dart';
+import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
+import 'package:flight_delay_predict/views/prediction/widgets/date_time_card.dart';
+import 'package:flight_delay_predict/views/prediction/widgets/flight_info_card.dart';
+import 'package:flight_delay_predict/views/prediction/widgets/weather_card.dart';
+import 'package:flight_delay_predict/widgets/app_drawer.dart';
+import 'package:flight_delay_predict/widgets/custom_button.dart';
+import 'package:flight_delay_predict/widgets/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/utils/app_toast.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../../core/theme/theme.dart';
-import '../../models/prediction_request.dart';
-import '../../viewmodels/prediction_viewmodel.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/loading_dialog.dart';
-import '../../widgets/app_drawer.dart';
-import 'widgets/flight_info_card.dart';
-import 'widgets/date_time_card.dart';
-import 'widgets/weather_card.dart';
 
 class PredictionView extends ConsumerStatefulWidget {
   const PredictionView({super.key});
@@ -184,7 +186,6 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
           _windDir10mController.text = '90.0';
           _windDir100mController.text = '90.0';
           _windGustsController.text = '6.0';
-          break;
         case 'rainy':
           _tempController.text = '24.0';
           _humidityController.text = '95.0';
@@ -199,7 +200,6 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
           _windDir10mController.text = '270.0';
           _windDir100mController.text = '270.0';
           _windGustsController.text = '45.0';
-          break;
         case 'windy':
           _tempController.text = '26.0';
           _humidityController.text = '85.0';
@@ -214,7 +214,6 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
           _windDir10mController.text = '230.0';
           _windDir100mController.text = '228.0';
           _windGustsController.text = '60.0';
-          break;
         case 'moderate':
         default:
           _tempController.text = '28.0';
@@ -230,7 +229,6 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
           _windDir10mController.text = '180.0';
           _windDir100mController.text = '180.0';
           _windGustsController.text = '12.0';
-          break;
       }
     });
     AppToast.show('Applied ${type.toUpperCase()} weather preset');
@@ -290,7 +288,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     } else {
       final err = ref.read(predictionProvider).errorMessage;
       if (!mounted) return;
-      showDialog(
+      await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Row(
@@ -399,7 +397,7 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
 
               // SUBMIT BUTTON
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: CustomButton(
                   text: 'Run Delay Estimation',
                   icon: Icons.online_prediction,
@@ -413,4 +411,3 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
     );
   }
 }
-

@@ -1,9 +1,10 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../core/theme/theme.dart';
-import '../viewmodels/auth_viewmodel.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -16,7 +17,7 @@ class AppDrawer extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     // Get the current route path to highlight the active menu item
-    final String currentRoute = GoRouterState.of(context).uri.path;
+    final currentRoute = GoRouterState.of(context).uri.path;
 
     return Drawer(
       elevation: 0,
@@ -114,7 +115,7 @@ class AppDrawer extends ConsumerWidget {
           // Navigation list
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
                 _buildDrawerItem(
                   context: context,
@@ -146,8 +147,8 @@ class AppDrawer extends ConsumerWidget {
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   child: Divider(),
                 ),
@@ -162,8 +163,8 @@ class AppDrawer extends ConsumerWidget {
                 if (authState.isAdmin) ...[
                   const Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     child: Divider(),
                   ),
@@ -177,13 +178,13 @@ class AppDrawer extends ConsumerWidget {
                 ],
                 const Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   child: Divider(),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4.0),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
@@ -203,7 +204,7 @@ class AppDrawer extends ConsumerWidget {
                     ),
                     onTap: () {
                       Navigator.pop(context);
-                      ref.read(authProvider.notifier).signOut();
+                      unawaited(ref.read(authProvider.notifier).signOut());
                     },
                   ),
                 ),
@@ -213,7 +214,7 @@ class AppDrawer extends ConsumerWidget {
 
           // Footer
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Text(
               '${l10n?.version ?? 'Version'} 1.0.0',
               textAlign: TextAlign.center,
@@ -239,7 +240,7 @@ class AppDrawer extends ConsumerWidget {
     final isSelected = currentRoute == route;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: isSelected
             ? theme.colorScheme.primary.withValues(alpha: 0.12)
