@@ -40,7 +40,7 @@ class InfoCenterNotifier extends Notifier<InfoCenterState> {
   @override
   InfoCenterState build() {
     final locale = ref.watch(localeProvider);
-    unawaited(loadData(locale.languageCode));
+    unawaited(Future.microtask(() => loadData(locale.languageCode)));
     
     final previousState = stateOrNull;
     return InfoCenterState(
