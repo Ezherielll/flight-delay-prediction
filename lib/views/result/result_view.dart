@@ -1,11 +1,12 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import '../../viewmodels/prediction_viewmodel.dart';
-import '../../core/theme/theme.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class ResultView extends ConsumerWidget {
   const ResultView({super.key});
@@ -54,7 +55,7 @@ class ResultView extends ConsumerWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             // STATUS BLOCK CARD
@@ -68,8 +69,8 @@ class ResultView extends ConsumerWidget {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  vertical: 32.0,
-                  horizontal: 20.0,
+                  vertical: 32,
+                  horizontal: 20,
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
@@ -110,7 +111,7 @@ class ResultView extends ConsumerWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         color: statusColor,
-                        letterSpacing: 1.0,
+                        letterSpacing: 1,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -202,7 +203,7 @@ class ResultView extends ConsumerWidget {
             // FLIGHT DETAILS SUMMARY
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -225,6 +226,8 @@ class ResultView extends ConsumerWidget {
                     ),
                     const Divider(height: 24),
                     _buildParamRow('Airline Code', request.airline),
+                    _buildParamRow('Origin', request.origin ?? 'Default (CGK)'),
+                    _buildParamRow('Destination', request.destination ?? 'Default (CGK)'),
                     _buildParamRow('Movement Type', request.movementType),
                     _buildParamRow('Flight Type', request.fltType),
                     _buildParamRow(
@@ -263,20 +266,21 @@ class ResultView extends ConsumerWidget {
                       final details =
                           'Flight Delay Prediction Result:\n'
                           '- Airline: ${request.airline}\n'
+                          '- Route: ${request.origin ?? 'CGK'} → ${request.destination ?? 'CGK'}\n'
                           '- Prediction: ${response.prediction}\n'
                           '- Delay Probability: $probabilityPercent%\n'
                           '- Confidence: ${response.confidence}\n'
                           '- Weather Temp: ${request.temperature2m}°C\n'
                           '- Rain: ${request.rain}mm';
-                      Clipboard.setData(ClipboardData(text: details));
-                      Fluttertoast.showToast(
-                        msg: 'Prediction details copied to clipboard',
+                      unawaited(Clipboard.setData(ClipboardData(text: details)));
+                      AppToast.show(
+                        'Prediction details copied to clipboard',
                       );
                     },
                     icon: const Icon(Icons.copy),
                     label: const Text('Copy Results'),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -294,7 +298,7 @@ class ResultView extends ConsumerWidget {
                     icon: const Icon(Icons.refresh),
                     label: Text(l10n?.makeAnotherPrediction ?? 'Check Another'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -328,7 +332,7 @@ class ResultView extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: theme.colorScheme.onSurface.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(16),
@@ -362,7 +366,7 @@ class ResultView extends ConsumerWidget {
 
   Widget _buildParamRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

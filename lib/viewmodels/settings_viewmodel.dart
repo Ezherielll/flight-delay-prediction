@@ -1,6 +1,6 @@
+import 'package:flight_delay_predict/core/services/api_service.dart';
+import 'package:flight_delay_predict/core/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/services/api_service.dart';
-import '../core/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 1. Dependency Providers
@@ -20,12 +20,6 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 
 // 2. Settings State Class
 class SettingsState {
-  final bool isDarkMode;
-  final String baseUrl;
-  final bool isTestingConnection;
-  final bool? isConnected;
-  final String? connectionErrorMessage;
-
   SettingsState({
     required this.isDarkMode,
     required this.baseUrl,
@@ -33,6 +27,12 @@ class SettingsState {
     this.isConnected,
     this.connectionErrorMessage,
   });
+
+  final bool isDarkMode;
+  final String baseUrl;
+  final bool isTestingConnection;
+  final bool? isConnected;
+  final String? connectionErrorMessage;
 
   SettingsState copyWith({
     bool? isDarkMode,
@@ -62,15 +62,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
     );
   }
 
-  Future<void> toggleTheme(bool enabled) async {
+  Future<void> toggleTheme({required bool enabled}) async {
     final storageService = ref.read(storageServiceProvider);
-    await storageService.setDarkMode(enabled);
+    await storageService.setDarkMode(enabled: enabled);
     state = state.copyWith(isDarkMode: enabled);
   }
 
   Future<void> updateBaseUrl(String url) async {
     final storageService = ref.read(storageServiceProvider);
-    String formattedUrl = url.trim();
+    var formattedUrl = url.trim();
     if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
       formattedUrl = 'http://$formattedUrl';
     }
@@ -79,12 +79,12 @@ class SettingsNotifier extends Notifier<SettingsState> {
       formattedUrl = formattedUrl.substring(0, formattedUrl.length - 1);
     }
     await storageService.setBaseUrl(formattedUrl);
-    state = state.copyWith(baseUrl: formattedUrl, isConnected: null);
+    state = state.copyWith(baseUrl: formattedUrl);
   }
 
   Future<void> testConnection() async {
     final apiService = ref.read(apiServiceProvider);
-    state = state.copyWith(isTestingConnection: true, isConnected: null);
+    state = state.copyWith(isTestingConnection: true);
     try {
       final success = await apiService.checkHealth();
       state = state.copyWith(
@@ -92,7 +92,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
         isConnected: success,
         connectionErrorMessage: success ? null : 'Could not reach server health endpoint.',
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isTestingConnection: false,
         isConnected: false,
@@ -102,7 +102,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void resetConnectionStatus() {
-    state = state.copyWith(isConnected: null, connectionErrorMessage: null);
+    state = state.copyWith();
   }
 }
 

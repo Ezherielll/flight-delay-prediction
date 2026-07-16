@@ -1,7 +1,8 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
-import '../../core/theme/theme.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -24,28 +25,28 @@ class _SplashViewState extends State<SplashView>
       duration: const Duration(milliseconds: 1500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.65, curve: Curves.easeIn),
+        curve: const Interval(0, 0.65, curve: Curves.easeIn),
       ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.65, curve: Curves.easeOutBack),
+        curve: const Interval(0, 0.65, curve: Curves.easeOutBack),
       ),
     );
 
-    _controller.forward();
+    unawaited(_controller.forward());
 
     // Navigate to Home after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    unawaited(Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         context.go('/home');
       }
-    });
+    }));
   }
 
   @override

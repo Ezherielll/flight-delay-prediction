@@ -1,17 +1,4 @@
 class InfoCenterData {
-  final AboutInfo about;
-  final ClassificationInfo classification;
-  final List<AirlineRef> airlines;
-  final List<AirportRef> airports;
-  final List<WeatherParam> weatherParameters;
-  final WeatherSeverity weatherSeverity;
-  final PredictionGuide predictionGuide;
-  final List<MlModel> mlModels;
-  final FeatureImportanceInfo featureImportance;
-  final List<FaqItem> faq;
-  final List<WorkflowStep> workflow;
-  final List<GlossaryItem> glossary;
-
   InfoCenterData({
     required this.about,
     required this.classification,
@@ -57,14 +44,22 @@ class InfoCenterData {
           .toList(),
     );
   }
+
+  final AboutInfo about;
+  final ClassificationInfo classification;
+  final List<AirlineRef> airlines;
+  final List<AirportRef> airports;
+  final List<WeatherParam> weatherParameters;
+  final WeatherSeverity weatherSeverity;
+  final PredictionGuide predictionGuide;
+  final List<MlModel> mlModels;
+  final FeatureImportanceInfo featureImportance;
+  final List<FaqItem> faq;
+  final List<WorkflowStep> workflow;
+  final List<GlossaryItem> glossary;
 }
 
 class AboutInfo {
-  final String purpose;
-  final String importance;
-  final String mlUsage;
-  final List<String> dataSources;
-
   AboutInfo({
     required this.purpose,
     required this.importance,
@@ -80,13 +75,14 @@ class AboutInfo {
       dataSources: List<String>.from(json['data_sources'] as List<dynamic>),
     );
   }
+
+  final String purpose;
+  final String importance;
+  final String mlUsage;
+  final List<String> dataSources;
 }
 
 class ClassificationInfo {
-  final String onTime;
-  final String delay;
-  final String definition;
-
   ClassificationInfo({
     required this.onTime,
     required this.delay,
@@ -100,13 +96,13 @@ class ClassificationInfo {
       definition: json['definition'] as String,
     );
   }
+
+  final String onTime;
+  final String delay;
+  final String definition;
 }
 
 class AirlineRef {
-  final String code;
-  final String name;
-  final String country;
-
   AirlineRef({
     required this.code,
     required this.name,
@@ -120,14 +116,13 @@ class AirlineRef {
       country: json['country'] as String,
     );
   }
+
+  final String code;
+  final String name;
+  final String country;
 }
 
 class AirportRef {
-  final String iata;
-  final String name;
-  final String city;
-  final String country;
-
   AirportRef({
     required this.iata,
     required this.name,
@@ -143,14 +138,14 @@ class AirportRef {
       country: json['country'] as String,
     );
   }
+
+  final String iata;
+  final String name;
+  final String city;
+  final String country;
 }
 
 class WeatherParam {
-  final String name;
-  final String unit;
-  final String description;
-  final String impact;
-
   WeatherParam({
     required this.name,
     required this.unit,
@@ -166,13 +161,14 @@ class WeatherParam {
       impact: json['impact'] as String,
     );
   }
+
+  final String name;
+  final String unit;
+  final String description;
+  final String impact;
 }
 
 class WeatherSeverity {
-  final List<SeverityBand> visibility;
-  final List<SeverityBand> windSpeed;
-  final List<SeverityBand> rain;
-
   WeatherSeverity({
     required this.visibility,
     required this.windSpeed,
@@ -192,13 +188,13 @@ class WeatherSeverity {
           .toList(),
     );
   }
+
+  final List<SeverityBand> visibility;
+  final List<SeverityBand> windSpeed;
+  final List<SeverityBand> rain;
 }
 
 class SeverityBand {
-  final String level;
-  final String range;
-  final String description;
-
   SeverityBand({
     required this.level,
     required this.range,
@@ -212,13 +208,13 @@ class SeverityBand {
       description: json['description'] as String,
     );
   }
+
+  final String level;
+  final String range;
+  final String description;
 }
 
 class PredictionGuide {
-  final String onTimeMeaning;
-  final String delayMeaning;
-  final String confidenceExpl;
-
   PredictionGuide({
     required this.onTimeMeaning,
     required this.delayMeaning,
@@ -232,12 +228,13 @@ class PredictionGuide {
       confidenceExpl: json['confidence_expl'] as String,
     );
   }
+
+  final String onTimeMeaning;
+  final String delayMeaning;
+  final String confidenceExpl;
 }
 
 class MlModel {
-  final String name;
-  final List<String> advantages;
-
   MlModel({
     required this.name,
     required this.advantages,
@@ -249,12 +246,12 @@ class MlModel {
       advantages: List<String>.from(json['advantages'] as List<dynamic>),
     );
   }
+
+  final String name;
+  final List<String> advantages;
 }
 
 class FeatureImportanceInfo {
-  final String intro;
-  final List<FeatureWeight> topFeatures;
-
   FeatureImportanceInfo({
     required this.intro,
     required this.topFeatures,
@@ -268,12 +265,12 @@ class FeatureImportanceInfo {
           .toList(),
     );
   }
+
+  final String intro;
+  final List<FeatureWeight> topFeatures;
 }
 
 class FeatureWeight {
-  final String feature;
-  final String impact;
-
   FeatureWeight({
     required this.feature,
     required this.impact,
@@ -285,12 +282,12 @@ class FeatureWeight {
       impact: json['impact'] as String,
     );
   }
+
+  final String feature;
+  final String impact;
 }
 
 class FaqItem {
-  final String question;
-  final String answer;
-
   FaqItem({
     required this.question,
     required this.answer,
@@ -302,13 +299,12 @@ class FaqItem {
       answer: json['answer'] as String,
     );
   }
+
+  final String question;
+  final String answer;
 }
 
 class WorkflowStep {
-  final String step;
-  final String name;
-  final String desc;
-
   WorkflowStep({
     required this.step,
     required this.name,
@@ -322,12 +318,13 @@ class WorkflowStep {
       desc: json['desc'] as String,
     );
   }
+
+  final String step;
+  final String name;
+  final String desc;
 }
 
 class GlossaryItem {
-  final String term;
-  final String definition;
-
   GlossaryItem({
     required this.term,
     required this.definition,
@@ -339,4 +336,7 @@ class GlossaryItem {
       definition: json['definition'] as String,
     );
   }
+
+  final String term;
+  final String definition;
 }

@@ -1,22 +1,24 @@
+import 'dart:async';
 import 'dart:convert';
+
+import 'package:flight_delay_predict/models/info_center_data.dart';
+import 'package:flight_delay_predict/viewmodels/locale_viewmodel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/info_center_data.dart';
-import 'locale_viewmodel.dart';
 
 // 1. State Class
 class InfoCenterState {
-  final InfoCenterData? data;
-  final bool isLoading;
-  final String? errorMessage;
-  final String searchQuery;
-
   InfoCenterState({
     this.data,
     this.isLoading = false,
     this.errorMessage,
     this.searchQuery = '',
   });
+
+  final InfoCenterData? data;
+  final bool isLoading;
+  final String? errorMessage;
+  final String searchQuery;
 
   InfoCenterState copyWith({
     InfoCenterData? data,
@@ -38,7 +40,7 @@ class InfoCenterNotifier extends Notifier<InfoCenterState> {
   @override
   InfoCenterState build() {
     final locale = ref.watch(localeProvider);
-    Future.microtask(() => loadData(locale.languageCode));
+    unawaited(Future.microtask(() => loadData(locale.languageCode)));
     
     final previousState = stateOrNull;
     return InfoCenterState(
@@ -49,23 +51,23 @@ class InfoCenterNotifier extends Notifier<InfoCenterState> {
   }
 
   Future<void> loadData([String? languageCode]) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final code = languageCode ?? ref.read(localeProvider).languageCode;
       // Load static data from JSON asset file based on active language
       final fileName = code == 'id' ? 'info_center_id.json' : 'info_center.json';
       final jsonString = await rootBundle.loadString('assets/data/$fileName');
-      final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+      final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
       final infoCenterData = InfoCenterData.fromJson(jsonMap);
 
       state = state.copyWith(
         data: infoCenterData,
         isLoading: false,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load Knowledge Base data: ${e.toString()}',
+        errorMessage: 'Failed to load Knowledge Base data: $e',
       );
     }
   }

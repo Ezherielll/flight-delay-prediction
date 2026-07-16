@@ -1,11 +1,13 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flight_delay_predict/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../viewmodels/prediction_viewmodel.dart';
-import '../../viewmodels/settings_viewmodel.dart';
-import '../../core/theme/theme.dart';
-import '../../widgets/app_drawer.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
@@ -17,6 +19,7 @@ class HomeView extends ConsumerWidget {
     final settingsState = ref.watch(settingsProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
     final l10n = AppLocalizations.of(context);
+    final authState = ref.watch(authProvider);
 
     final totalPredictions = predictionState.history.length;
     final delayedCount = predictionState.history
@@ -35,7 +38,7 @@ class HomeView extends ConsumerWidget {
               color: theme.colorScheme.primary,
             ),
             onPressed: () {
-              settingsNotifier.toggleTheme(!settingsState.isDarkMode);
+              unawaited(settingsNotifier.toggleTheme(enabled: !settingsState.isDarkMode));
             },
           ),
           IconButton(
@@ -98,8 +101,8 @@ class HomeView extends ConsumerWidget {
                       elevation: 4,
                       shadowColor: Colors.black26,
                       padding: const EdgeInsets.symmetric(
-                        vertical: 14.0,
-                        horizontal: 20.0,
+                        vertical: 14,
+                        horizontal: 20,
                       ),
                     ),
                   ),
@@ -111,7 +114,7 @@ class HomeView extends ConsumerWidget {
 
             // Statistics Row
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -162,7 +165,7 @@ class HomeView extends ConsumerWidget {
 
             // Navigation Sections
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -201,6 +204,16 @@ class HomeView extends ConsumerWidget {
                     AppTheme.primaryColor,
                     () => context.push('/info'),
                   ),
+                  // Admin Panel — only visible to admin users
+                  if (authState.isAdmin)
+                    _buildMenuCard(
+                      context,
+                      'Admin Panel',
+                      'Manage users, roles, and view all prediction records across the system.',
+                      Icons.admin_panel_settings,
+                      AppTheme.warningColor,
+                      () => context.push('/admin'),
+                    ),
                 ],
               ),
             ),
@@ -229,9 +242,9 @@ class HomeView extends ConsumerWidget {
           width: 1.5,
         ),
       ),
-      margin: const EdgeInsets.all(4.0),
+      margin: const EdgeInsets.all(4),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Column(
           children: [
             Icon(icon, color: color, size: 28),
@@ -265,7 +278,7 @@ class HomeView extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       elevation: 0,
       color: theme.colorScheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
@@ -279,7 +292,7 @@ class HomeView extends ConsumerWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(

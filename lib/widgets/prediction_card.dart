@@ -1,19 +1,18 @@
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/models/history_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/history_item.dart';
-import '../core/theme/theme.dart';
 
 class PredictionCard extends StatelessWidget {
-  final HistoryItem item;
-  final VoidCallback? onDelete;
-  final VoidCallback? onTap;
 
   const PredictionCard({
-    super.key,
-    required this.item,
+    required this.item, super.key,
     this.onDelete,
     this.onTap,
   });
+  final HistoryItem item;
+  final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,7 @@ class PredictionCard extends StatelessWidget {
               Container(width: 6, color: statusColor),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -73,7 +72,6 @@ class PredictionCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: statusColor.withValues(alpha: 0.3),
-                                width: 1,
                               ),
                             ),
                             child: Text(
@@ -127,12 +125,15 @@ class PredictionCard extends StatelessWidget {
                             ),
                           ),
                           if (onDelete != null)
-                            GestureDetector(
-                              onTap: onDelete,
-                              child: Icon(
-                                Icons.delete_outline,
-                                size: 18,
-                                color: theme.colorScheme.error.withValues(alpha: 0.8),
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: onDelete,
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  size: 18,
+                                  color: theme.colorScheme.error.withValues(alpha: 0.8),
+                                ),
                               ),
                             ),
                         ],

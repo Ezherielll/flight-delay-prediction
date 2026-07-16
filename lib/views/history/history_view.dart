@@ -1,11 +1,15 @@
+import 'dart:async';
+
+import 'package:flight_delay_predict/core/services/export_service.dart';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/models/history_item.dart';
+import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
+import 'package:flight_delay_predict/widgets/app_drawer.dart';
+import 'package:flight_delay_predict/widgets/prediction_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../viewmodels/prediction_viewmodel.dart';
-import '../../widgets/prediction_card.dart';
-import '../../core/theme/theme.dart';
-import '../../widgets/app_drawer.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
@@ -22,12 +26,18 @@ class HistoryView extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n?.history ?? 'Estimation History'),
         actions: [
-          if (state.history.isNotEmpty)
+          if (state.history.isNotEmpty) ...[
+            IconButton(
+              icon: const Icon(Icons.download),
+              tooltip: 'Export History',
+              onPressed: () => _showExportOptions(context, state.history),
+            ),
             IconButton(
               icon: const Icon(Icons.delete_sweep, color: AppTheme.dangerColor),
               tooltip: l10n?.clearAllHistory ?? 'Clear All History',
               onPressed: () => _confirmClearAll(context, notifier),
             ),
+          ],
         ],
       ),
       body: state.history.isEmpty
@@ -87,7 +97,7 @@ class HistoryView extends ConsumerWidget {
                   background: Container(
                     color: AppTheme.dangerColor,
                     alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 24.0),
+                    padding: const EdgeInsets.only(right: 24),
                     child: const Icon(
                       Icons.delete,
                       color: Colors.white,
@@ -112,7 +122,7 @@ class HistoryView extends ConsumerWidget {
                             item.request,
                             item.response,
                           );
-                      context.push('/result');
+                      unawaited(context.push('/result'));
                     },
                   ),
                 );
@@ -123,34 +133,90 @@ class HistoryView extends ConsumerWidget {
 
   void _confirmClearAll(BuildContext context, PredictionNotifier notifier) {
     final l10n = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n?.confirmClearAllTitle ?? 'Clear All History?'),
-        content: Text(
-            l10n?.confirmClearAllDesc ?? 'This action will permanently delete all saved prediction inputs and outcomes from local storage.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n?.confirmClearAllTitle ?? 'Clear All History?'),
+          content: Text(
+            l10n?.confirmClearAllDesc ??
+                'This action will permanently delete all saved prediction '
+                'inputs and outcomes from local storage.',
           ),
-          ElevatedButton(
-            onPressed: () async {
-              await notifier.clearAllHistory();
-              if (!context.mounted) return;
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n?.historyCleared ?? 'History cleared successfully')),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.dangerColor,
-              foregroundColor: Colors.white,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n?.cancel ?? 'Cancel'),
             ),
-            child: Text(l10n?.clearAll ?? 'Clear All'),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () async {
+                await notifier.clearAllHistory();
+                if (!context.mounted) return;
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      l10n?.historyCleared ?? 'History cleared successfully',
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.dangerColor,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n?.clearAll ?? 'Clear All'),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showExportOptions(BuildContext context, List<HistoryItem> history) {
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) {
+          final theme = Theme.of(ctx);
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Export Estimation History',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.description, color: Colors.blue),
+                  title: const Text('Export to CSV (Excel compatible)'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    unawaited(ExportService.exportHistoryToCsv(history));
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                  title: const Text('Export to PDF (Print-ready)'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    unawaited(ExportService.exportHistoryToPdf(history));
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
     );
   }
 }

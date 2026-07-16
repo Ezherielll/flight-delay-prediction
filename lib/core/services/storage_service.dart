@@ -1,9 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
-  final SharedPreferences _prefs;
-
   StorageService(this._prefs);
+
+  final SharedPreferences _prefs;
 
   static const String _keyBaseUrl = 'base_url';
   static const String _keyDarkMode = 'dark_mode';
@@ -33,7 +33,7 @@ class StorageService {
     return _prefs.getBool(_keyDarkMode) ?? false;
   }
 
-  Future<void> setDarkMode(bool enabled) async {
+  Future<void> setDarkMode({required bool enabled}) async {
     await _prefs.setBool(_keyDarkMode, enabled);
   }
 
@@ -47,9 +47,7 @@ class StorageService {
   }
 
   Future<void> addHistoryItem(String itemJson) async {
-    final list = getHistoryRaw();
-    // Add to front of list (newest first)
-    list.insert(0, itemJson);
+    final list = getHistoryRaw()..insert(0, itemJson);
     // Limit history to 50 items
     if (list.length > 50) {
       list.removeRange(50, list.length);

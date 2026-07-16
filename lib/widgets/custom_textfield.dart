@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
+
+  const CustomTextField({
+    required this.controller, required this.label, super.key,
+    this.hint,
+    this.prefixIcon,
+    this.suffixText,
+    this.keyboardType = TextInputType.text,
+    this.inputFormatters,
+    this.validator,
+    this.onChanged,
+  });
   final TextEditingController controller;
   final String label;
   final String? hint;
@@ -12,24 +23,11 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
 
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    required this.label,
-    this.hint,
-    this.prefixIcon,
-    this.suffixText,
-    this.keyboardType = TextInputType.text,
-    this.inputFormatters,
-    this.validator,
-    this.onChanged,
-  });
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

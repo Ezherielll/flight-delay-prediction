@@ -1,13 +1,13 @@
+import 'dart:async';
+import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
+import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flight_delay_predict/viewmodels/locale_viewmodel.dart';
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart';
+import 'package:flight_delay_predict/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import '../../viewmodels/settings_viewmodel.dart';
-import '../../core/theme/theme.dart';
-import '../../widgets/custom_textfield.dart';
-import '../../widgets/custom_button.dart';
-import '../../viewmodels/locale_viewmodel.dart';
-import 'package:flight_delay_predict/l10n/app_localizations.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -36,11 +36,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   Future<void> _saveUrl() async {
     final newUrl = _urlController.text.trim();
     if (newUrl.isEmpty) {
-      Fluttertoast.showToast(msg: 'Server URL cannot be empty');
+      AppToast.show('Server URL cannot be empty', isError: true);
       return;
     }
     await ref.read(settingsProvider.notifier).updateBaseUrl(newUrl);
-    Fluttertoast.showToast(msg: 'API address saved: $newUrl');
+    AppToast.show('API address saved: $newUrl');
     // Hide keyboard
     if (!mounted) return;
     FocusScope.of(context).unfocus();
@@ -52,12 +52,26 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     final state = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final l10n = AppLocalizations.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(l10n?.applicationSettings ?? 'Application Settings'),
+        title: Text(
+          l10n?.applicationSettings ?? 'Application Settings',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: theme.colorScheme.onSurface,
+          ),
           onPressed: () {
             notifier.resetConnectionStatus();
             if (context.canPop()) {
@@ -69,97 +83,151 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // API CONFIGURATION SECTION CARD
-            Card(
+            // API CONFIGURATION SECTION
+            Container(
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.colorScheme.onSurface.withValues(
+                    alpha: isDark ? 0.08 : 0.05,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.dns, color: theme.colorScheme.primary),
-                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.dns_rounded,
+                            color: theme.colorScheme.primary,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
                         Text(
-                          l10n?.apiEndpointConfig ?? 'API Endpoint Configuration',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          l10n?.apiEndpointConfig ??
+                              'API Endpoint Configuration',
+                          style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Text(
-                      l10n?.apiEndpointDesc ?? 'Specify the endpoint of your FastAPI backend server. Running in Android emulator requires 10.0.2.2:8000 for localhost access.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      l10n?.apiEndpointDesc ??
+                          'Specify the endpoint of your FastAPI backend server. Running in Android emulator requires 10.0.2.2:8000 for localhost access.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         height: 1.4,
+                        fontSize: 13,
                       ),
                     ),
-                    const Divider(height: 24),
+                    const SizedBox(height: 20),
                     CustomTextField(
                       controller: _urlController,
                       label: l10n?.backendUrlLabel ?? 'Backend URL / Server IP',
                       hint: l10n?.backendUrlHint ?? 'e.g. http://10.0.2.2:8000',
-                      prefixIcon: Icons.link,
+                      prefixIcon: Icons.link_rounded,
                     ),
-                    const SizedBox(height: 8),
-                    
+                    const SizedBox(height: 16),
+
                     // Connection Status indicator
                     if (state.isConnected != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: state.isConnected!
-                              ? AppTheme.successColor.withValues(alpha: 0.1)
-                              : AppTheme.dangerColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(10),
+                              ? AppTheme.successColor.withValues(alpha: 0.08)
+                              : AppTheme.dangerColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: state.isConnected!
-                                ? AppTheme.successColor.withValues(alpha: 0.3)
-                                : AppTheme.dangerColor.withValues(alpha: 0.3),
+                                ? AppTheme.successColor.withValues(alpha: 0.25)
+                                : AppTheme.dangerColor.withValues(alpha: 0.25),
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              state.isConnected!
-                                  ? Icons.check_circle_outline
-                                  : Icons.error_outline,
-                              color: state.isConnected!
-                                  ? AppTheme.successColor
-                                  : AppTheme.dangerColor,
-                              size: 20,
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: state.isConnected!
+                                    ? AppTheme.successColor.withValues(
+                                        alpha: 0.15,
+                                      )
+                                    : AppTheme.dangerColor.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                state.isConnected!
+                                    ? Icons.check_rounded
+                                    : Icons.close_rounded,
+                                color: state.isConnected!
+                                    ? AppTheme.successColor
+                                    : AppTheme.dangerColor,
+                                size: 16,
+                              ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                    Text(
-                                      state.isConnected!
-                                          ? (l10n?.connectionSuccess ?? 'Connection Test Successful!')
-                                          : (l10n?.connectionFailed ?? 'Connection Test Failed'),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: state.isConnected!
-                                            ? AppTheme.successColor
-                                            : AppTheme.dangerColor,
-                                        fontSize: 14,
-                                      ),
+                                  Text(
+                                    state.isConnected!
+                                        ? (l10n?.connectionSuccess ??
+                                              'Connection Test Successful!')
+                                        : (l10n?.connectionFailed ??
+                                              'Connection Test Failed'),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: state.isConnected!
+                                          ? AppTheme.successColor
+                                          : AppTheme.dangerColor,
+                                      fontSize: 14,
                                     ),
-                                  if (!state.isConnected! && state.connectionErrorMessage != null) ...[
+                                  ),
+                                  if (!state.isConnected! &&
+                                      state.connectionErrorMessage != null) ...[
                                     const SizedBox(height: 4),
                                     Text(
                                       state.connectionErrorMessage!,
                                       style: TextStyle(
-                                        color: AppTheme.dangerColor.withValues(alpha: 0.8),
+                                        color: isDark
+                                            ? const Color(0xFFFDA4AF)
+                                            : AppTheme.dangerColor.withValues(
+                                                alpha: 0.8,
+                                              ),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -170,7 +238,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                     ],
 
                     Row(
@@ -187,24 +255,68 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                                 ? const SizedBox(
                                     height: 16,
                                     width: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
-                                : const Icon(Icons.speed),
-                            label: Text(state.isTestingConnection
-                                ? (l10n?.testing ?? 'Testing...')
-                                : (l10n?.testConnection ?? 'Test Connection')),
+                                : const Icon(Icons.speed_rounded, size: 18),
+                            label: Text(
+                              state.isTestingConnection
+                                  ? (l10n?.testing ?? 'Testing...')
+                                  : (l10n?.testConnection ?? 'Test Connection'),
+                            ),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                              ),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              side: BorderSide(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: CustomButton(
-                            text: l10n?.saveUrl ?? 'Save URL',
-                            onPressed: state.isTestingConnection ? null : _saveUrl,
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? [
+                                        const Color(0xFF60A5FA),
+                                        const Color(0xFF3B82F6),
+                                      ]
+                                    : [
+                                        AppTheme.primaryColor,
+                                        const Color(0xFF1D4ED8),
+                                      ],
+                              ),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: state.isTestingConnection
+                                  ? null
+                                  : _saveUrl,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: Text(
+                                l10n?.saveUrl ?? 'Save URL',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -214,60 +326,140 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // PREFERENCES SECTION CARD (DARK MODE)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+            // PREFERENCES (DARK MODE)
+            Container(
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.colorScheme.onSurface.withValues(
+                    alpha: isDark ? 0.08 : 0.05,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
                 child: SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
                   title: Row(
                     children: [
-                      Icon(
-                        state.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                        color: theme.colorScheme.primary,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          state.isDarkMode
+                              ? Icons.dark_mode_rounded
+                              : Icons.light_mode_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Text(
                         l10n?.enableDarkMode ?? 'Enable Dark Mode Theme',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
-                  subtitle: Text(l10n?.enableDarkModeDesc ?? 'Toggle between sleek dark colors and light slate layouts.'),
+                  subtitle: Text(
+                    l10n?.enableDarkModeDesc ??
+                        'Toggle between sleek dark colors and light slate layouts.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
                   value: state.isDarkMode,
+                  activeThumbColor: theme.colorScheme.primary,
                   onChanged: (val) {
-                    notifier.toggleTheme(val);
+                    unawaited(notifier.toggleTheme(enabled: val));
                   },
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Card(
+            const SizedBox(height: 20),
+
+            // LANGUAGE CARD
+            Container(
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.colorScheme.onSurface.withValues(
+                    alpha: isDark ? 0.08 : 0.05,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.language, color: theme.colorScheme.primary),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.language_rounded,
+                            color: theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         Text(
                           AppLocalizations.of(context)?.language ?? 'Language',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
-                      l10n?.selectLanguageDesc ?? 'Select application language / Pilih bahasa aplikasi',
+                      l10n?.selectLanguageDesc ??
+                          'Select application language / Pilih bahasa aplikasi',
                       style: TextStyle(
                         fontSize: 13,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
-                    const Divider(height: 24),
+                    const Divider(height: 32),
                     Row(
                       children: [
                         Expanded(
@@ -314,7 +506,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
     return InkWell(
       onTap: () {
-        ref.read(localeProvider.notifier).setLocale(Locale(languageCode));
+        unawaited(ref.read(localeProvider.notifier).setLocale(Locale(languageCode)));
       },
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
@@ -337,17 +529,14 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
-                  )
+                  ),
                 ]
               : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              flag,
-              style: const TextStyle(fontSize: 18),
-            ),
+            Text(flag, style: const TextStyle(fontSize: 18)),
             const SizedBox(width: 8),
             Text(
               label,

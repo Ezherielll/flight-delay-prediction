@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
+
+  const CustomDropdown({
+    required this.label, required this.items, super.key,
+    this.value,
+    this.hint,
+    this.onChanged,
+    this.validator,
+    this.prefixIcon,
+  });
   final T? value;
   final String label;
   final String? hint;
@@ -9,22 +18,11 @@ class CustomDropdown<T> extends StatelessWidget {
   final String? Function(T?)? validator;
   final IconData? prefixIcon;
 
-  const CustomDropdown({
-    super.key,
-    required this.label,
-    required this.items,
-    this.value,
-    this.hint,
-    this.onChanged,
-    this.validator,
-    this.prefixIcon,
-  });
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

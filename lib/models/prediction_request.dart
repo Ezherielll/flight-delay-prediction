@@ -1,4 +1,56 @@
 class PredictionRequest {
+  PredictionRequest({
+    required this.airline,
+    required this.movementType,
+    required this.fltType,
+    required this.date,
+    required this.hour,
+    required this.temperature2m,
+    required this.relativeHumidity2m,
+    required this.rain,
+    required this.surfacePressure,
+    required this.cloudCover,
+    required this.cloudCoverLow,
+    required this.cloudCoverMid,
+    required this.cloudCoverHigh,
+    required this.windSpeed10m,
+    required this.windSpeed100m,
+    required this.windDirection10m,
+    required this.windDirection100m,
+    required this.windGusts10m,
+    this.acType,
+    this.origin,
+    this.destination,
+    this.weatherCode,
+  });
+
+  factory PredictionRequest.fromJson(Map<String, dynamic> json) {
+    return PredictionRequest(
+      airline: json['airline'] as String,
+      movementType: json['movement_type'] as String,
+      fltType: json['flt_type'] as String,
+      date: json['date'] as String,
+      hour: json['hour'] as int,
+      temperature2m: (json['temperature_2m'] as num).toDouble(),
+      relativeHumidity2m: (json['relative_humidity_2m'] as num).toDouble(),
+      rain: (json['rain'] as num).toDouble(),
+      surfacePressure: (json['surface_pressure'] as num).toDouble(),
+      cloudCover: (json['cloud_cover'] as num).toDouble(),
+      cloudCoverLow: (json['cloud_cover_low'] as num).toDouble(),
+      cloudCoverMid: (json['cloud_cover_mid'] as num).toDouble(),
+      cloudCoverHigh: (json['cloud_cover_high'] as num).toDouble(),
+      windSpeed10m: (json['wind_speed_10m'] as num).toDouble(),
+      windSpeed100m: (json['wind_speed_100m'] as num).toDouble(),
+      windDirection10m: (json['wind_direction_10m'] as num).toDouble(),
+      windDirection100m: (json['wind_direction_100m'] as num).toDouble(),
+      windGusts10m: (json['wind_gusts_10m'] as num).toDouble(),
+      acType: json['ac_type'] as String?,
+      origin: json['origin'] as String?,
+      destination: json['destination'] as String?,
+      weatherCode: json['weather_code'] as int?,
+    );
+  }
+
   final String airline;
   final String movementType;
   final String fltType;
@@ -29,33 +81,8 @@ class PredictionRequest {
   final String? destination;
   final int? weatherCode;
 
-  PredictionRequest({
-    required this.airline,
-    required this.movementType,
-    required this.fltType,
-    required this.date,
-    required this.hour,
-    required this.temperature2m,
-    required this.relativeHumidity2m,
-    required this.rain,
-    required this.surfacePressure,
-    required this.cloudCover,
-    required this.cloudCoverLow,
-    required this.cloudCoverMid,
-    required this.cloudCoverHigh,
-    required this.windSpeed10m,
-    required this.windSpeed100m,
-    required this.windDirection10m,
-    required this.windDirection100m,
-    required this.windGusts10m,
-    this.acType,
-    this.origin,
-    this.destination,
-    this.weatherCode,
-  });
-
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
+    final data = <String, dynamic>{
       'airline': airline,
       'movement_type': movementType,
       'flt_type': fltType,
@@ -82,32 +109,5 @@ class PredictionRequest {
     if (weatherCode != null) data['weather_code'] = weatherCode;
 
     return data;
-  }
-
-  factory PredictionRequest.fromJson(Map<String, dynamic> json) {
-    return PredictionRequest(
-      airline: json['airline'] as String,
-      movementType: json['movement_type'] as String,
-      fltType: json['flt_type'] as String,
-      date: json['date'] as String,
-      hour: json['hour'] as int,
-      temperature2m: (json['temperature_2m'] as num).toDouble(),
-      relativeHumidity2m: (json['relative_humidity_2m'] as num).toDouble(),
-      rain: (json['rain'] as num).toDouble(),
-      surfacePressure: (json['surface_pressure'] as num).toDouble(),
-      cloudCover: (json['cloud_cover'] as num).toDouble(),
-      cloudCoverLow: (json['cloud_cover_low'] as num).toDouble(),
-      cloudCoverMid: (json['cloud_cover_mid'] as num).toDouble(),
-      cloudCoverHigh: (json['cloud_cover_high'] as num).toDouble(),
-      windSpeed10m: (json['wind_speed_10m'] as num).toDouble(),
-      windSpeed100m: (json['wind_speed_100m'] as num).toDouble(),
-      windDirection10m: (json['wind_direction_10m'] as num).toDouble(),
-      windDirection100m: (json['wind_direction_100m'] as num).toDouble(),
-      windGusts10m: (json['wind_gusts_10m'] as num).toDouble(),
-      acType: json['ac_type'] as String?,
-      origin: json['origin'] as String?,
-      destination: json['destination'] as String?,
-      weatherCode: json['weather_code'] as int?,
-    );
   }
 }

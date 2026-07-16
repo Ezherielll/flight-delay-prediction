@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flight_delay_predict/models/prediction_response.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('PredictionResponse', () {

@@ -1,17 +1,20 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
-  final String? message;
-
   const LoadingDialog({super.key, this.message});
 
+  final String? message;
+
   static void show(BuildContext context, {String? message}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      useRootNavigator: true,
-      builder: (context) => LoadingDialog(message: message),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => LoadingDialog(message: message),
+      ),
     );
   }
 
@@ -35,7 +38,7 @@ class LoadingDialog extends StatelessWidget {
         backgroundColor: theme.colorScheme.surfaceContainerLowest,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 32.0),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

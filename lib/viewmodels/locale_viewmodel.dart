@@ -1,6 +1,7 @@
 import 'dart:ui';
+
+import 'package:flight_delay_predict/viewmodels/settings_viewmodel.dart'; // To get storageServiceProvider
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'settings_viewmodel.dart'; // To get storageServiceProvider
 
 class LocaleNotifier extends Notifier<Locale> {
   @override
@@ -18,7 +19,7 @@ class LocaleNotifier extends Notifier<Locale> {
     return const Locale('en');
   }
 
-  void setLocale(Locale locale) async {
+  Future<void> setLocale(Locale locale) async {
     final storageService = ref.read(storageServiceProvider);
     await storageService.setLocale(locale.languageCode);
     state = locale;
