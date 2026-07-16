@@ -4,9 +4,19 @@ import 'package:flight_delay_predict/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 
 class FlightInfoCard extends StatelessWidget {
-
   const FlightInfoCard({
-    required this.selectedAirline, required this.selectedMovementType, required this.selectedFltType, required this.selectedOrigin, required this.selectedDestination, required this.customAirlineController, required this.onAirlineChanged, required this.onMovementChanged, required this.onFltTypeChanged, required this.onOriginChanged, required this.onDestinationChanged, super.key,
+    required this.selectedAirline,
+    required this.selectedMovementType,
+    required this.selectedFltType,
+    required this.selectedOrigin,
+    required this.selectedDestination,
+    required this.customAirlineController,
+    required this.onAirlineChanged,
+    required this.onMovementChanged,
+    required this.onFltTypeChanged,
+    required this.onOriginChanged,
+    required this.onDestinationChanged,
+    super.key,
   });
   final String? selectedAirline;
   final String? selectedMovementType;
@@ -94,7 +104,10 @@ class FlightInfoCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   l10n?.flightInformation ?? 'Flight Information',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -174,7 +187,7 @@ class FlightInfoCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: CustomDropdown<String>(
-                    label: 'Origin (Optional)',
+                    label: 'Origin',
                     value: selectedOrigin,
                     hint: 'Default: CGK',
                     prefixIcon: Icons.flight_takeoff,
@@ -192,7 +205,7 @@ class FlightInfoCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: CustomDropdown<String>(
-                    label: 'Destination (Optional)',
+                    label: 'Destination',
                     value: selectedDestination,
                     hint: 'Default: CGK',
                     prefixIcon: Icons.flight_land,

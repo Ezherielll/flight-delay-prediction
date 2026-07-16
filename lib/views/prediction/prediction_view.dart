@@ -30,8 +30,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   String? _selectedAirline;
   String? _selectedMovementType;
   String? _selectedFltType = 'schedule';
-  String? _selectedOrigin;
-  String? _selectedDestination;
+  String? _selectedOrigin = 'KNO';
+  String? _selectedDestination = 'CGK';
 
   // Time: date picker + hour dropdown
   DateTime? _selectedDate;
