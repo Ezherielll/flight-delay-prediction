@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../../core/utils/app_toast.dart';
 import '../../viewmodels/settings_viewmodel.dart';
 import '../../core/theme/theme.dart';
 import '../../widgets/custom_textfield.dart';
@@ -35,11 +35,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   Future<void> _saveUrl() async {
     final newUrl = _urlController.text.trim();
     if (newUrl.isEmpty) {
-      Fluttertoast.showToast(msg: 'Server URL cannot be empty');
+      AppToast.show('Server URL cannot be empty', isError: true);
       return;
     }
     await ref.read(settingsProvider.notifier).updateBaseUrl(newUrl);
-    Fluttertoast.showToast(msg: 'API address saved: $newUrl');
+    AppToast.show('API address saved: $newUrl');
     // Hide keyboard
     if (!mounted) return;
     FocusScope.of(context).unfocus();

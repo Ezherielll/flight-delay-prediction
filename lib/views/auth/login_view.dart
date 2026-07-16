@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme.dart';
 import '../../viewmodels/auth_viewmodel.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../../core/utils/app_toast.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -49,10 +49,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
       
       final authState = ref.read(authProvider);
       if (authState.isAuthenticated) {
-        Fluttertoast.showToast(
-          msg: 'Welcome back!',
-          backgroundColor: AppTheme.successColor,
-          textColor: Colors.white,
+        AppToast.show(
+          'Welcome back!',
         );
         if (mounted) {
           context.go('/home');

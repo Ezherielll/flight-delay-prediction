@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../viewmodels/prediction_viewmodel.dart';
 import '../../viewmodels/settings_viewmodel.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 import '../../core/theme/theme.dart';
 import '../../widgets/app_drawer.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
@@ -17,6 +18,7 @@ class HomeView extends ConsumerWidget {
     final settingsState = ref.watch(settingsProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
     final l10n = AppLocalizations.of(context);
+    final authState = ref.watch(authProvider);
 
     final totalPredictions = predictionState.history.length;
     final delayedCount = predictionState.history
@@ -201,6 +203,16 @@ class HomeView extends ConsumerWidget {
                     AppTheme.primaryColor,
                     () => context.push('/info'),
                   ),
+                  // Admin Panel — only visible to admin users
+                  if (authState.isAdmin)
+                    _buildMenuCard(
+                      context,
+                      'Admin Panel',
+                      'Manage users, roles, and view all prediction records across the system.',
+                      Icons.admin_panel_settings,
+                      AppTheme.warningColor,
+                      () => context.push('/admin'),
+                    ),
                 ],
               ),
             ),

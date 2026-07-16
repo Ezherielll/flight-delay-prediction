@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_client/serverpod_auth_client.dart';
+import 'package:flight_server_client/flight_server_client.dart';
 import '../core/services/auth_service.dart';
+import '../core/services/serverpod_client.dart';
+import '../models/user_role.dart';
 import 'settings_viewmodel.dart';
 
 class AuthState {
@@ -8,41 +11,54 @@ class AuthState {
   final UserInfo? user;
   final bool isLoading;
   final String? errorMessage;
+  final UserRoleType role;
 
   AuthState({
     required this.isAuthenticated,
     this.user,
     this.isLoading = false,
     this.errorMessage,
+    this.role = UserRoleType.amc,
   });
+
+  bool get isAdmin => role == UserRoleType.admin;
 
   AuthState copyWith({
     bool? isAuthenticated,
     UserInfo? user,
     bool? isLoading,
     String? errorMessage,
+    UserRoleType? role,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       user: user ?? this.user,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage, // Reset if null
+      role: role ?? this.role,
     );
   }
 }
 
 class AuthViewModel extends Notifier<AuthState> {
   late final AuthService _authService;
+  late final Client _client;
 
   @override
   AuthState build() {
     _authService = ref.watch(authServiceProvider);
+    _client = ref.watch(serverpodClientProvider);
 
     // Add listener to SessionManager updates (automatic session updates)
     _authService.sessionManager.addListener(_onSessionChanged);
     ref.onDispose(() {
       _authService.sessionManager.removeListener(_onSessionChanged);
     });
+
+    // If already signed in, fetch role
+    if (_authService.isSignedIn) {
+      _fetchRole();
+    }
 
     return AuthState(
       isAuthenticated: _authService.isSignedIn,
@@ -51,10 +67,27 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   void _onSessionChanged() {
+    final isSignedIn = _authService.isSignedIn;
     state = AuthState(
-      isAuthenticated: _authService.isSignedIn,
+      isAuthenticated: isSignedIn,
       user: _authService.sessionManager.signedInUser,
     );
+    if (isSignedIn) {
+      _fetchRole();
+    }
+  }
+
+  /// Fetch the user's role from the server and update state.
+  Future<void> _fetchRole() async {
+    try {
+      final userRole = await _client.userRole.getMyRole();
+      state = state.copyWith(
+        role: UserRoleType.fromString(userRole.role),
+      );
+    } catch (e) {
+      // If fetching role fails, default to amc
+      state = state.copyWith(role: UserRoleType.amc);
+    }
   }
 
   Future<void> signIn(String email, String password) async {
@@ -67,6 +100,8 @@ class AuthViewModel extends Notifier<AuthState> {
           user: user,
           isLoading: false,
         );
+        // Fetch role after successful sign in
+        await _fetchRole();
       } else {
         state = state.copyWith(
           isLoading: false,

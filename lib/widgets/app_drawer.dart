@@ -82,6 +82,29 @@ class AppDrawer extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                const SizedBox(height: 8),
+                // Role Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: authState.isAdmin
+                        ? AppTheme.warningColor.withValues(alpha: 0.25)
+                        : Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    authState.role.displayName,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: authState.isAdmin
+                          ? AppTheme.warningColor
+                          : Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -135,6 +158,23 @@ class AppDrawer extends ConsumerWidget {
                   route: '/settings',
                   currentRoute: currentRoute,
                 ),
+                // Admin Panel — only visible to admin users
+                if (authState.isAdmin) ...[
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Divider(),
+                  ),
+                  _buildDrawerItem(
+                    context: context,
+                    title: 'Admin Panel',
+                    icon: Icons.admin_panel_settings_rounded,
+                    route: '/admin',
+                    currentRoute: currentRoute,
+                  ),
+                ],
                 const Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.0,

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme.dart';
 import '../../viewmodels/auth_viewmodel.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../../core/utils/app_toast.dart';
 
 class RegisterView extends ConsumerStatefulWidget {
   const RegisterView({super.key});
@@ -60,11 +60,8 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
       
       final authState = ref.read(authProvider);
       if (success && authState.errorMessage == null) {
-        Fluttertoast.showToast(
-          msg: 'Verification code generated! Please check console log.',
-          backgroundColor: AppTheme.infoColor,
-          textColor: Colors.white,
-          toastLength: Toast.LENGTH_LONG,
+        AppToast.show(
+          'Verification code generated! Please check console log.',
         );
         setState(() {
           _isVerifying = true;
@@ -75,10 +72,9 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
 
   void _handleVerify() async {
     if (_verificationController.text.trim().isEmpty) {
-      Fluttertoast.showToast(
-        msg: 'Please enter verification code',
-        backgroundColor: AppTheme.warningColor,
-        textColor: Colors.white,
+      AppToast.show(
+        'Please enter verification code',
+        isError: true,
       );
       return;
     }
@@ -90,10 +86,8 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
 
     final authState = ref.read(authProvider);
     if (authState.isAuthenticated && authState.errorMessage == null) {
-      Fluttertoast.showToast(
-        msg: 'Account verified successfully!',
-        backgroundColor: AppTheme.successColor,
-        textColor: Colors.white,
+      AppToast.show(
+        'Account verified successfully!',
       );
       if (mounted) {
         context.go('/home');

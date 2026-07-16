@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../../core/utils/app_toast.dart';
 import '../../viewmodels/prediction_viewmodel.dart';
 import '../../core/theme/theme.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
@@ -225,6 +225,8 @@ class ResultView extends ConsumerWidget {
                     ),
                     const Divider(height: 24),
                     _buildParamRow('Airline Code', request.airline),
+                    _buildParamRow('Origin', request.origin ?? 'Default (CGK)'),
+                    _buildParamRow('Destination', request.destination ?? 'Default (CGK)'),
                     _buildParamRow('Movement Type', request.movementType),
                     _buildParamRow('Flight Type', request.fltType),
                     _buildParamRow(
@@ -263,14 +265,15 @@ class ResultView extends ConsumerWidget {
                       final details =
                           'Flight Delay Prediction Result:\n'
                           '- Airline: ${request.airline}\n'
+                          '- Route: ${request.origin ?? 'CGK'} → ${request.destination ?? 'CGK'}\n'
                           '- Prediction: ${response.prediction}\n'
                           '- Delay Probability: $probabilityPercent%\n'
                           '- Confidence: ${response.confidence}\n'
                           '- Weather Temp: ${request.temperature2m}°C\n'
                           '- Rain: ${request.rain}mm';
                       Clipboard.setData(ClipboardData(text: details));
-                      Fluttertoast.showToast(
-                        msg: 'Prediction details copied to clipboard',
+                      AppToast.show(
+                        'Prediction details copied to clipboard',
                       );
                     },
                     icon: const Icon(Icons.copy),

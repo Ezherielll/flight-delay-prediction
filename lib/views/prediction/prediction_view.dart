@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../../core/utils/app_toast.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import '../../core/theme/theme.dart';
 import '../../models/prediction_request.dart';
@@ -28,6 +28,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
   String? _selectedAirline;
   String? _selectedMovementType;
   String? _selectedFltType = 'schedule';
+  String? _selectedOrigin;
+  String? _selectedDestination;
 
   // Time: date picker + hour dropdown
   DateTime? _selectedDate;
@@ -231,13 +233,13 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
           break;
       }
     });
-    Fluttertoast.showToast(msg: 'Applied ${type.toUpperCase()} weather preset');
+    AppToast.show('Applied ${type.toUpperCase()} weather preset');
     _checkFormValidity();
   }
 
   Future<void> _submitPrediction() async {
     if (!_formKey.currentState!.validate() || !_isFormValid) {
-      Fluttertoast.showToast(msg: 'Please correct validation errors');
+      AppToast.show('Please correct validation errors', isError: true);
       return;
     }
 
@@ -269,6 +271,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
       windDirection10m: double.parse(_windDir10mController.text),
       windDirection100m: double.parse(_windDir100mController.text),
       windGusts10m: double.parse(_windGustsController.text),
+      origin: _selectedOrigin,
+      destination: _selectedDestination,
     );
 
     if (!mounted) return;
@@ -331,6 +335,8 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                 selectedAirline: _selectedAirline,
                 selectedMovementType: _selectedMovementType,
                 selectedFltType: _selectedFltType,
+                selectedOrigin: _selectedOrigin,
+                selectedDestination: _selectedDestination,
                 customAirlineController: _customAirlineController,
                 onAirlineChanged: (val) {
                   setState(() {
@@ -348,6 +354,12 @@ class _PredictionViewState extends ConsumerState<PredictionView> {
                 onFltTypeChanged: (val) {
                   setState(() => _selectedFltType = val);
                   _checkFormValidity();
+                },
+                onOriginChanged: (val) {
+                  setState(() => _selectedOrigin = val);
+                },
+                onDestinationChanged: (val) {
+                  setState(() => _selectedDestination = val);
                 },
               ),
 

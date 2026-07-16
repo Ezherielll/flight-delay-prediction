@@ -21,6 +21,7 @@ An elegant, modern, and highly responsive **Material Design 3** mobile and web a
 - **🌦️ Weather Presets (Templates)**: Single-tap quick presets (e.g. *Clear Sky, Heavy Rain, Windy Storm, Moderate Weather*) that automatically populate all 13 weather parameters with realistic, pre-validated data.
 - **🔄 Modern State Management**: Built using **Riverpod** notifier flow to guarantee predictable state changes and separation of concerns.
 - **🌓 Adaptive Theme**: Sleek dark and light modes styled around Material 3 dynamic color guidelines.
+- **👥 Role-Based Access Control (RBAC)**: Restricts and structures access based on two user roles (Administrator & Petugas AMC) with server-side checking and GoRouter guards.
 - **🏗️ Clean Architecture (MVVM)**: Highly decoupled design with clear divisions between views, viewmodels, models, services, and widgets.
 
 ---
@@ -58,17 +59,21 @@ lib/
 ├── models/
 │   ├── prediction_request.dart   # Dart representation of prediction features
 │   ├── prediction_response.dart  # Model mapping probability & confidence classes
-│   └── history_item.dart         # Wrapper for request/response logs
+│   ├── history_item.dart         # Wrapper for request/response logs
+│   └── user_role.dart            # UserRole enum and parser
 ├── viewmodels/
 │   ├── settings_viewmodel.dart   # Riverpod notifier for URL/Theme preferences
 │   ├── prediction_viewmodel.dart # State management for queries, presets & Serverpod history
-│   └── auth_viewmodel.dart       # Riverpod notifier for user session state
+│   ├── auth_viewmodel.dart       # Riverpod notifier for user session state & role info
+│   └── admin_viewmodel.dart      # Admin dashboard actions (users, roles)
 ├── views/
 │   ├── splash/
 │   │   └── splash_view.dart      # Launch splash screen with animations
 │   ├── auth/
 │   │   ├── login_view.dart       # Glassmorphic Email Login form screen
 │   │   └── register_view.dart    # User registration with inline OTP input
+│   ├── admin/
+│   │   └── admin_panel_view.dart # Tabbed panel for user roles & all prediction logs
 │   ├── home/
 │   │   └── home_view.dart        # Stats dashboard & landing panel
 │   ├── prediction/
@@ -106,7 +111,8 @@ cd ../flight_server
 # 1. Start PostgreSQL & Redis databases
 docker compose up -d
 
-# 2. Apply database migrations
+# 2. Generate and apply database migrations (if models change, e.g. user_role)
+serverpod create-migration
 dart bin/main.dart --apply-migrations
 
 # 3. Start Serverpod server
@@ -142,6 +148,7 @@ flutter run --release
   - **Views**: UI layouts. They listen to provider states and display widgets accordingly.
   - **ViewModels**: Manage business logic and asynchronous tasks, completely decoupled from UI code.
 - **Riverpod State Flow**:
-  - `authProvider`: Manages user authentication state, handles session login/logout, and listens to the local Serverpod `SessionManager`.
+  - `authProvider`: Manages user authentication state, handles session login/logout, and listens to the local Serverpod `SessionManager` + user role updates.
   - `settingsProvider`: Exposes user options (theme preference, target API URL) and triggers FastAPI connectivity verification.
   - `predictionProvider`: Manages the API submission process, stores current prediction configurations, and maintains the database history list.
+  - `adminProvider`: Handles administrative data management including list of registered user roles and all system predictions.

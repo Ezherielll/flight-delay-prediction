@@ -11,7 +11,9 @@ import '../../views/settings/settings_view.dart';
 import '../../views/info/info_center_view.dart';
 import '../../views/auth/login_view.dart';
 import '../../views/auth/register_view.dart';
+import '../../views/admin/admin_panel_view.dart';
 import '../../viewmodels/auth_viewmodel.dart';
+import '../utils/app_toast.dart';
 
 class GoRouterRefreshNotifier extends ChangeNotifier {
   final Ref ref;
@@ -25,6 +27,7 @@ class GoRouterRefreshNotifier extends ChangeNotifier {
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: AppToast.navigatorKey,
     initialLocation: '/',
     refreshListenable: GoRouterRefreshNotifier(ref),
     redirect: (BuildContext context, GoRouterState state) {
@@ -42,6 +45,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (loggingIn) {
+        return '/home';
+      }
+
+      // Admin route guard: redirect non-admin users to /home
+      if (state.matchedLocation == '/admin' && !authState.isAdmin) {
         return '/home';
       }
 
@@ -100,6 +108,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/info',
         builder: (BuildContext context, GoRouterState state) {
           return const InfoCenterView();
+        },
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (BuildContext context, GoRouterState state) {
+          return const AdminPanelView();
         },
       ),
     ],

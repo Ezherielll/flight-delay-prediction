@@ -6,6 +6,8 @@ import '../../widgets/prediction_card.dart';
 import '../../core/theme/theme.dart';
 import '../../widgets/app_drawer.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
+import '../../core/services/export_service.dart';
+import '../../models/history_item.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
@@ -22,12 +24,18 @@ class HistoryView extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n?.history ?? 'Estimation History'),
         actions: [
-          if (state.history.isNotEmpty)
+          if (state.history.isNotEmpty) ...[
+            IconButton(
+              icon: const Icon(Icons.download),
+              tooltip: 'Export History',
+              onPressed: () => _showExportOptions(context, state.history),
+            ),
             IconButton(
               icon: const Icon(Icons.delete_sweep, color: AppTheme.dangerColor),
               tooltip: l10n?.clearAllHistory ?? 'Clear All History',
               onPressed: () => _confirmClearAll(context, notifier),
             ),
+          ],
         ],
       ),
       body: state.history.isEmpty
@@ -151,6 +159,51 @@ class HistoryView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showExportOptions(BuildContext context, List<HistoryItem> history) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Export Estimation History',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.description, color: Colors.blue),
+                  title: const Text('Export to CSV (Excel compatible)'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    ExportService.exportHistoryToCsv(history);
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                  title: const Text('Export to PDF (Print-ready)'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    ExportService.exportHistoryToPdf(history);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
