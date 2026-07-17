@@ -185,27 +185,28 @@ class AppDrawer extends ConsumerWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
+                  child: Material(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: ListTile(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    leading: const Icon(
-                      Icons.logout_rounded,
-                      color: AppTheme.dangerColor,
-                    ),
-                    title: const Text(
-                      'Log Out',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
+                    clipBehavior: Clip.antiAlias,
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      leading: const Icon(
+                        Icons.logout_rounded,
                         color: AppTheme.dangerColor,
                       ),
+                      title: const Text(
+                        'Log Out',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.dangerColor,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        unawaited(ref.read(authProvider.notifier).signOut());
+                      },
                     ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      unawaited(ref.read(authProvider.notifier).signOut());
-                    },
                   ),
                 ),
               ],
@@ -241,37 +242,38 @@ class AppDrawer extends ConsumerWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
+      child: Material(
         color: isSelected
             ? theme.colorScheme.primary.withValues(alpha: 0.12)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-      ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        leading: Icon(
-          icon,
-          color: isSelected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurface.withValues(alpha: 0.7),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          leading: Icon(
+            icon,
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+          ),
+          onTap: () {
+            // Close drawer
+            Navigator.pop(context);
+            // Navigate to route if not already there
+            if (!isSelected) {
+              context.go(route);
+            }
+          },
         ),
-        onTap: () {
-          // Close drawer
-          Navigator.pop(context);
-          // Navigate to route if not already there
-          if (!isSelected) {
-            context.go(route);
-          }
-        },
       ),
     );
   }

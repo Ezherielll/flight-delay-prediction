@@ -348,52 +348,55 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: SwitchListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  title: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.1,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          state.isDarkMode
-                              ? Icons.dark_mode_rounded
-                              : Icons.light_mode_rounded,
-                          color: theme.colorScheme.primary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n?.enableDarkMode ?? 'Enable Dark Mode Theme',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                  subtitle: Text(
-                    l10n?.enableDarkModeDesc ??
-                        'Toggle between sleek dark colors and light slate layouts.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                child: Material(
+                  color: Colors.transparent,
+                  child: SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
                     ),
+                    title: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            state.isDarkMode
+                                ? Icons.dark_mode_rounded
+                                : Icons.light_mode_rounded,
+                            color: theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          l10n?.enableDarkMode ?? 'Enable Dark Mode Theme',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Text(
+                      l10n?.enableDarkModeDesc ??
+                          'Toggle between sleek dark colors and light slate layouts.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    value: state.isDarkMode,
+                    activeThumbColor: theme.colorScheme.primary,
+                    onChanged: (val) {
+                      unawaited(notifier.toggleTheme(enabled: val));
+                    },
                   ),
-                  value: state.isDarkMode,
-                  activeThumbColor: theme.colorScheme.primary,
-                  onChanged: (val) {
-                    unawaited(notifier.toggleTheme(enabled: val));
-                  },
                 ),
               ),
             ),
