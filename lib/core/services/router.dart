@@ -57,64 +57,151 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (context, state) {
-          return const SplashView();
-        },
+        pageBuilder: (context, state) => _buildFadePage(
+          context,
+          state,
+          const SplashView(),
+        ),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) {
-          return const LoginView();
-        },
+        pageBuilder: (context, state) => _buildBottomSlidePage(
+          context,
+          state,
+          const LoginView(),
+        ),
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) {
-          return const RegisterView();
-        },
+        pageBuilder: (context, state) => _buildBottomSlidePage(
+          context,
+          state,
+          const RegisterView(),
+        ),
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) {
-          return const HomeView();
-        },
+        pageBuilder: (context, state) => _buildFadePage(
+          context,
+          state,
+          const HomeView(),
+        ),
       ),
       GoRoute(
         path: '/predict',
-        builder: (context, state) {
-          return const PredictionView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const PredictionView(),
+        ),
       ),
       GoRoute(
         path: '/result',
-        builder: (context, state) {
-          return const ResultView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const ResultView(),
+        ),
       ),
       GoRoute(
         path: '/history',
-        builder: (context, state) {
-          return const HistoryView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const HistoryView(),
+        ),
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) {
-          return const SettingsView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const SettingsView(),
+        ),
       ),
       GoRoute(
         path: '/info',
-        builder: (context, state) {
-          return const InfoCenterView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const InfoCenterView(),
+        ),
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) {
-          return const AdminPanelView();
-        },
+        pageBuilder: (context, state) => _buildSlidePage(
+          context,
+          state,
+          const AdminPanelView(),
+        ),
       ),
     ],
   );
 });
+
+CustomTransitionPage<void> _buildFadePage(
+  BuildContext context,
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
+}
+
+CustomTransitionPage<void> _buildSlidePage(
+  BuildContext context,
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOut,
+          ),
+        ),
+        child: child,
+      );
+    },
+  );
+}
+
+CustomTransitionPage<void> _buildBottomSlidePage(
+  BuildContext context,
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 1),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOut,
+          ),
+        ),
+        child: child,
+      );
+    },
+  );
+}

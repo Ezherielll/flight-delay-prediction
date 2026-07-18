@@ -18,12 +18,8 @@ void main() async {
   final sharedPrefs = await SharedPreferences.getInstance();
 
   // Initialize Serverpod Client & SessionManager
-  final client = Client(
-    'http://localhost:8080/',
-    // FlutterAuthenticationKeyManager is deprecated but still required by Serverpod
-    // ignore: deprecated_member_use
-    authenticationKeyManager: FlutterAuthenticationKeyManager(),
-  );
+  final client = Client('http://localhost:8080/')
+    ..authKeyProvider = FlutterAuthenticationKeyManager();
   final sessionManager = SessionManager(caller: client.modules.auth);
   await sessionManager.initialize();
 

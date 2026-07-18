@@ -41,10 +41,17 @@ class _SplashViewState extends State<SplashView>
 
     unawaited(_controller.forward());
 
-    // Navigate to Home after 2 seconds
-    unawaited(Future.delayed(const Duration(seconds: 2), () {
+    // Navigate to Home after 2 seconds with a smooth exit animation
+    unawaited(Future.delayed(const Duration(milliseconds: 1650), () async {
       if (mounted) {
-        context.go('/home');
+        await _controller.animateTo(
+          0,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+        );
+        if (mounted) {
+          context.go('/home');
+        }
       }
     }));
   }
