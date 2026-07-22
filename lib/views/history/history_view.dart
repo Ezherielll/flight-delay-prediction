@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flight_delay_predict/core/services/export_service.dart';
 import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
 import 'package:flight_delay_predict/l10n/app_localizations.dart';
 import 'package:flight_delay_predict/models/history_item.dart';
 import 'package:flight_delay_predict/viewmodels/prediction_viewmodel.dart';
@@ -87,12 +88,7 @@ class HistoryView extends ConsumerWidget {
                   onDismissed: (direction) async {
                     await notifier.deleteHistoryItem(index);
                     if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    AppToast.show(l10n?.historyItemRemoved ?? 'History item removed');
                   },
                   background: Container(
                     color: AppTheme.dangerColor,
@@ -109,12 +105,7 @@ class HistoryView extends ConsumerWidget {
                     onDelete: () async {
                       await notifier.deleteHistoryItem(index);
                       if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n?.historyItemRemoved ?? 'History item removed'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                      AppToast.show(l10n?.historyItemRemoved ?? 'History item removed');
                     },
                     onTap: () {
                       // Set as the current result and navigate to ResultView
@@ -153,13 +144,7 @@ class HistoryView extends ConsumerWidget {
                 await notifier.clearAllHistory();
                 if (!context.mounted) return;
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      l10n?.historyCleared ?? 'History cleared successfully',
-                    ),
-                  ),
-                );
+                AppToast.show(l10n?.historyCleared ?? 'History cleared successfully');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.dangerColor,

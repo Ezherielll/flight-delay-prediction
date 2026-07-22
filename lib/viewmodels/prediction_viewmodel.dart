@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flight_delay_predict/core/services/auth_service.dart';
 import 'package:flight_delay_predict/core/services/serverpod_client.dart';
 import 'package:flight_delay_predict/models/history_item.dart';
 import 'package:flight_delay_predict/models/prediction_request.dart';
@@ -126,12 +127,18 @@ class PredictionNotifier extends Notifier<PredictionState> {
   // Load history from Serverpod server
   Future<void> _loadHistory() async {
     try {
+      final authService = ref.read(authServiceProvider);
+      if (!authService.isSignedIn) {
+        state = state.copyWith(history: []);
+        return;
+      }
+
       final client = ref.read(serverpodClientProvider);
       final records = await client.predictionHistory.getUserHistory();
       final historyItems = records.map(_toHistoryItem).toList();
       state = state.copyWith(history: historyItems);
     } on Exception catch (_) {
-      // In case of error (e.g. backend offline), initialize empty list
+      // In case of error (e.g. backend offline or unauthenticated), initialize empty list
       state = state.copyWith(history: []);
     }
   }
@@ -147,21 +154,28 @@ class PredictionNotifier extends Notifier<PredictionState> {
       final predictionResponse = PredictionResponse.fromJson(responseMap);
 
       // Create local history item
-      final historyItem = HistoryItem(
+      var historyItem = HistoryItem(
         request: request,
         response: predictionResponse,
         timestamp: DateTime.now(),
       );
 
-      // 2. Save history item directly to Serverpod cloud database
-      final client = ref.read(serverpodClientProvider);
-      final record = _toPredictionRecord(historyItem);
-      final savedRecord = await client.predictionHistory.savePrediction(record);
-      final savedHistoryItem = _toHistoryItem(savedRecord);
+      // 2. Save history item directly to Serverpod cloud database if user is signed in
+      final authService = ref.read(authServiceProvider);
+      if (authService.isSignedIn) {
+        try {
+          final client = ref.read(serverpodClientProvider);
+          final record = _toPredictionRecord(historyItem);
+          final savedRecord = await client.predictionHistory.savePrediction(record);
+          historyItem = _toHistoryItem(savedRecord);
+        } on Exception catch (_) {
+          // Cloud history save error is non-fatal for ML inference presentation
+        }
+      }
 
       // Update state with result and updated history list
       final updatedHistory = List<HistoryItem>.from(state.history)
-        ..insert(0, savedHistoryItem);
+        ..insert(0, historyItem);
 
       state = state.copyWith(
         isLoading: false,

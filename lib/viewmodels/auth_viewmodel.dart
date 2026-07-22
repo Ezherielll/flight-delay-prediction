@@ -81,6 +81,10 @@ class AuthViewModel extends Notifier<AuthState> {
 
   /// Fetch the user's role from the server and update state.
   Future<void> _fetchRole() async {
+    if (!_authService.isSignedIn) {
+      state = state.copyWith(role: UserRoleType.amc);
+      return;
+    }
     try {
       final userRole = await _client.userRole.getMyRole();
       state = state.copyWith(
@@ -122,8 +126,15 @@ class AuthViewModel extends Notifier<AuthState> {
     state = state.copyWith(isLoading: true);
     try {
       final success = await _authService.createAccountRequest(username, email, password);
+      if (!success) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Email sudah terdaftar. Silakan login atau gunakan email lain.',
+        );
+        return false;
+      }
       state = state.copyWith(isLoading: false);
-      return success;
+      return true;
     } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -143,6 +154,8 @@ class AuthViewModel extends Notifier<AuthState> {
           user: user,
           isLoading: false,
         );
+        // Ensure user_role with assignedAt is created in DB immediately upon signup completion
+        await _fetchRole();
       } else {
         state = state.copyWith(
           isLoading: false,

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flight_delay_predict/core/services/export_service.dart';
 import 'package:flight_delay_predict/core/theme/theme.dart';
+import 'package:flight_delay_predict/core/utils/app_toast.dart';
 import 'package:flight_delay_predict/viewmodels/admin_viewmodel.dart';
 import 'package:flight_delay_predict/viewmodels/auth_viewmodel.dart';
 import 'package:flight_delay_predict/views/admin/widgets/analytics_tab.dart';
 import 'package:flight_delay_predict/widgets/app_drawer.dart';
+import 'package:flight_server_client/flight_server_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,17 +48,10 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
     final theme = Theme.of(context);
     final adminState = ref.watch(adminProvider);
 
-    // Listen for errors and show snackbar
+    // Listen for errors and show toast
     ref.listen<AdminState>(adminProvider, (prev, next) {
       if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: AppTheme.dangerColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
+        AppToast.show(next.errorMessage!, isError: true);
         ref.read(adminProvider.notifier).clearError();
       }
     });
@@ -411,6 +406,14 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
           final record = state.allPredictions[index];
           final isDelayed = record.prediction == 'Delayed';
 
+          // Look up user role
+          final userRole = state.users.cast<UserRole?>().firstWhere(
+                (u) => u?.userInfoId == record.userInfoId,
+                orElse: () => null,
+              );
+          final isUserAdmin = userRole?.role == 'admin';
+          final roleLabel = isUserAdmin ? 'Administrator' : 'Petugas AMC';
+
           return Card(
             elevation: 0,
             margin: const EdgeInsets.only(bottom: 10),
@@ -445,6 +448,28 @@ class _AdminPanelViewState extends ConsumerState<AdminPanelView>
                               fontSize: 12,
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                               fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isUserAdmin
+                                  ? AppTheme.warningColor.withValues(alpha: 0.12)
+                                  : AppTheme.infoColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              roleLabel,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isUserAdmin
+                                    ? AppTheme.warningColor
+                                    : AppTheme.infoColor,
+                              ),
                             ),
                           ),
                         ],

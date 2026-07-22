@@ -66,6 +66,9 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
         setState(() {
           _isVerifying = true;
         });
+      } else if (authState.errorMessage != null) {
+        AppToast.show(authState.errorMessage!, isError: true);
+        ref.read(authProvider.notifier).clearError();
       }
     }
   }
@@ -92,11 +95,21 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
       if (mounted) {
         context.go('/home');
       }
+    } else if (authState.errorMessage != null) {
+      AppToast.show(authState.errorMessage!, isError: true);
+      ref.read(authProvider.notifier).clearError();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AuthState>(authProvider, (prev, next) {
+      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
+        AppToast.show(next.errorMessage!, isError: true);
+        ref.read(authProvider.notifier).clearError();
+      }
+    });
+
     final authState = ref.watch(authProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
